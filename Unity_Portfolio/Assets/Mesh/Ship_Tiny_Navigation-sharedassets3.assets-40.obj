@@ -1,0 +1,17 @@
+# Mesh "Ship_Tiny_Navigation" exported with Unity Assets Bundle Extractor; 4 vertices, 6 indices, 320 bits per vertex
+g Ship_Tiny_Navigation
+# SubMesh 0
+# Vertices
+v -0.032131 0.121457 -0.159164
+vn -0.000000 0.999784 -0.020795
+v 0.032131 0.121457 -0.159164
+vn -0.000000 0.999784 -0.020795
+v 0.012371 0.129406 0.223030
+vn -0.000000 0.999784 -0.020795
+v -0.012371 0.129406 0.223030
+vn -0.000000 0.999784 -0.020795
+# Faces (1 to 4)
+g Ship_Tiny_Navigation_0
+f -2//-2 -3//-3 -4//-4
+f -1//-1 -2//-2 -4//-4
+
