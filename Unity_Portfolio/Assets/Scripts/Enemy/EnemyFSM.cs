@@ -120,6 +120,7 @@ public class EnemyFSM : MonoBehaviour
                     if (Vector3.Distance(targetArmy.position, transform.position) > Vector3.Distance(nearArmy[i].transform.position, transform.position))
                     {
                         targetArmy = nearArmy[i].transform;
+                        break;
                     }
                 }
                 //확인 했으면 공격
@@ -290,8 +291,20 @@ public class EnemyFSM : MonoBehaviour
         //애니메이션 시간.
         yield return new WaitForSeconds(0.3f);
 
-        es = EnemyState.Attack;
-        print("데미지드 -> 어택");
+        //아직 배에 타고 있다면 그냥 계속 배에 타고 있어라.
+        if (transform.parent != null)
+        {
+            es = EnemyState.inShip;
+            print("데미지드 -> 인쉽");
+        }
+        else
+        {
+            //범위가 맞지 않는 화살공격일 수 있으니 무브로 바꿔준다.
+            es = EnemyState.Move;
+            //적을 찾는 코루틴도 함께 실행해준다.
+            StartCoroutine(ChangeAttack());
+            print("데미지드 -> 무브");
+        }
     }
 
     private void Die()
@@ -406,5 +419,25 @@ public class EnemyFSM : MonoBehaviour
         agent.isStopped = false;
         //다시 이동
         es = EnemyState.Move;
+    }
+
+    public void StartPushed(Transform lancer)
+    {
+        StartCoroutine(Pushed(lancer));
+    }
+
+    //랜서 공격에 맞으면 뒤로 밀린다.
+    IEnumerator Pushed(Transform lancer)
+    {
+        //3번에 걸쳐 밀린다.
+        for (int i = 0; i < 3; i++)
+        {
+            Vector3 vt = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            vt += lancer.forward * 5.0f * Time.deltaTime; //뒤로 밀리기
+
+            transform.position = vt;
+
+            yield return new WaitForSeconds(0.01f);
+        }
     }
 }

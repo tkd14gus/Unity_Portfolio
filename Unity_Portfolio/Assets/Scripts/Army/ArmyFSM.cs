@@ -6,12 +6,12 @@ using UnityEngine.AI;
 
 public class ArmyFSM : MonoBehaviour
 {
-    private float attackDis = 1.5f;
-    private float curTime = 0.0f;
-    private float attackTime = 2.5f;
+    protected float attackDis = 1.5f;
+    protected float curTime = 0.0f;
+    protected float attackTime = 2.5f;
 
-    private NavMeshAgent agent;
-    private Transform targetEnemy;
+    protected NavMeshAgent agent;
+    protected Transform targetEnemy;
 
     //움직일 곳
     private Vector3 mPoint;
@@ -86,13 +86,13 @@ public class ArmyFSM : MonoBehaviour
 
     enum ArmyState
     {
-        Idle, Move, Attack, Damaged, Die, Defence, Heal, Escape
+        Idle, Move, Attack, Damaged, Die, Heal, Escape
     }
 
-    ArmyState ArSt = ArmyState.Idle;
-    
+    private ArmyState ArSt = ArmyState.Idle;
+
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         //이동속도 랜덤으로 준다.
         //speed = Random.Range(2.3f, 2.8f);
@@ -103,7 +103,7 @@ public class ArmyFSM : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         switch (ArSt)
         {
@@ -122,9 +122,6 @@ public class ArmyFSM : MonoBehaviour
             case ArmyState.Die:
                 Die();
                 break;
-            case ArmyState.Defence:
-                Defence();
-                break;
             case ArmyState.Heal:
                 Heal();
                 break;
@@ -134,7 +131,7 @@ public class ArmyFSM : MonoBehaviour
         }
     }
 
-    IEnumerator ChangeAttack()
+    protected virtual IEnumerator ChangeAttack()
     {
         while (true)
         {
@@ -147,7 +144,7 @@ public class ArmyFSM : MonoBehaviour
             {
                 //가까이에 있는 병사 확인
                 targetEnemy = nearEnemy[0].transform;
-                for (int i = 1; i < nearEnemy.Length; i++)
+                for (int i = 0; i < nearEnemy.Length; i++)
                 {
                     if (Vector3.Distance(targetEnemy.position, transform.position) > Vector3.Distance(nearEnemy[i].transform.position, transform.position))
                     {
@@ -163,6 +160,8 @@ public class ArmyFSM : MonoBehaviour
                 ArSt = ArmyState.Attack;
                 Debug.Log("All -> 어택");
 
+                //시선처리
+                //transform.LookAt(targetEnemy);
                 //골랐으면 녀석이 죽거나 다른 명령이 내려지기 전까지 바뀌지 않는다.
                 break;
             }
@@ -183,16 +182,21 @@ public class ArmyFSM : MonoBehaviour
 
         //다 이동했으면 다시 IDLE로
         if (Vector3.Distance(mPoint, transform.position) <= 0.7f)
+        {
             ArSt = ArmyState.Idle;
+            Debug.Log("무브 -> 대기");
+        }
+
     }
-    
-    private void Attack()
+
+    protected virtual void Attack()
     {
         //적이 비어있다면 대기 상태로 돌아간다.
         if(targetEnemy == null || targetEnemy.gameObject.activeSelf == false)
         {
             StartCoroutine(ChangeAttack());
             ArSt = ArmyState.Idle;
+            Debug.Log("어택 -> 대기");
             agent.SetDestination(transform.position);
             return;
         }
@@ -212,7 +216,7 @@ public class ArmyFSM : MonoBehaviour
            //속도 조절은 나중에 하자
            agent.SetDestination(targetEnemy.position);
            
-           if (Vector3.Distance(targetEnemy.position, transform.position) <= 0.2)
+           if (Vector3.Distance(targetEnemy.position, transform.position) <= 0.5)
            {
              Debug.Log("Army : 공겨어어어억!");
              //공격력 나중에 처리
@@ -270,7 +274,10 @@ public class ArmyFSM : MonoBehaviour
             StartCoroutine(DamagedMotion());
         }
         else
+        {
             ArSt = ArmyState.Die;
+            Debug.Log("All -> 대기");
+        }
     }
 
     IEnumerator DamagedMotion()
@@ -291,12 +298,6 @@ public class ArmyFSM : MonoBehaviour
         //스크립트를 종료시켜준다
         //후에 코루틴 사용하면 코루틴 후에
         gameObject.GetComponent<ArmyFSM>().enabled = false;
-        ArSt = ArmyState.Die;
-    }
-
-    private void Defence()
-    {
-
     }
 
     private void Heal()
@@ -332,5 +333,28 @@ public class ArmyFSM : MonoBehaviour
     {
         //스폰하면 무조건 상태는 IDLE
         ArSt = ArmyState.Idle;
+        Debug.Log("첫 시작 대기");
+    }
+
+    //랜서에서 상태를 공격으로 바꿔달라고 요청
+    protected void ChangeLancerAttack()
+    {
+        ArSt = ArmyState.Attack;
+        Debug.Log("All -> 어택");
+    }
+    //랜서에서 상태를 공격으로 바꿔달라고 요청
+    protected void ChangeLancerIdle()
+    {
+        ArSt = ArmyState.Idle;
+        Debug.Log("어택 -> 대기");
+    }
+
+    //랜서 Idle상태 확인
+    protected bool CheckIdle()
+    {
+        if (ArSt == ArmyState.Idle)
+            return true;
+        else
+            return false;
     }
 }
