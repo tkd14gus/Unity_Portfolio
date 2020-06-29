@@ -48,7 +48,7 @@ public class LanccerFSM : ArmyFSM
                 //정지하고
                 //일단 바로 공격
                 curTime = attackTime;
-                agent.isStopped = true;
+                //agent.isStopped = true;
                 ChangeLancerAttack();
                 
                 //골랐으면 녀석이 죽거나 다른 명령이 내려지기 전까지 바뀌지 않는다.
@@ -60,9 +60,18 @@ public class LanccerFSM : ArmyFSM
     //공격중일때 뒤로 물러나면 안된다.
     protected override void Attack()
     {
+        //Vector3 now = transform.position;
+        //내가 적을 바라보는 방향
+        //적을 내려다보거나 올려보 달때 회전하면서 캐릭터가 함께 움직임.
+        //그것을 방지
+        Vector3 e = targetEnemy.position;
+        e.y = 0;
+        Vector3 a = transform.position;
+        a.y = 0;
+        Vector3 dir = (e - a).normalized;
         //시선처리
-        //transform.rotation = Quaternion.Euler(targetEnemy.position - transform.position).normalized;
-        transform.LookAt(targetEnemy);
+        Quaternion q = Quaternion.LookRotation(dir);
+        transform.rotation = q;
 
         //적이 비어있다면 대기 상태로 돌아간다.
         if (targetEnemy == null || targetEnemy.gameObject.activeSelf == false)
@@ -83,19 +92,17 @@ public class LanccerFSM : ArmyFSM
             transform.position += targetEnemy.parent.forward * 0.6f * Time.deltaTime;
             return;
         }
-
+        
         //거리가 짧다면
         if (Vector3.Distance(targetEnemy.position, transform.position) < 1.0f)
         {
-            transform.position += targetEnemy.forward * -0.2f * Time.deltaTime;
+            transform.position += transform.forward * -0.5f * Time.deltaTime;
             return;
         }
+        //넓다면 움직이지 않음
         else
         {
-            Debug.Log("일안함?");
-            //넉넉하면 자기자리
-            Vector3 vt = new Vector3(0, 0, 0);
-            transform.position += vt;
+
         }
 
         //transform.rotation = Quaternion.Euler((targetEnemy.position - transform.position).normalized);
@@ -107,7 +114,7 @@ public class LanccerFSM : ArmyFSM
             //랜서는 워리어보다 사정거리가 멀다.
             //대신 가까워도 공격 못한다.
             if (Vector3.Distance(targetEnemy.position, transform.position) <= 1.5f &&
-                Vector3.Distance(targetEnemy.position, transform.position) >= 1.0f)
+                Vector3.Distance(targetEnemy.position, transform.position) >= 0.9f)
             {
                 Debug.Log("Army : 공겨어어어억!");
                 //공격력 나중에 처리

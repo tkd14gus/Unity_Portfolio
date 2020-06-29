@@ -340,6 +340,7 @@ public class ArmyFSM : MonoBehaviour
     protected void ChangeLancerAttack()
     {
         ArSt = ArmyState.Attack;
+        agent.isStopped = true;
         Debug.Log("All -> 어택");
     }
     //랜서에서 상태를 공격으로 바꿔달라고 요청
