@@ -55,8 +55,13 @@ public class ArmyFSM : MonoBehaviour
             print("All -> 탈출");
         }
     }
-
-    private int hp = 100;
+    private int maxHp;
+    public int MaxHP
+    {
+        get { return maxHp; }
+        set { maxHp = value; }
+    }
+    private int hp;
     public int HP
     {
         get { return hp; }
@@ -101,6 +106,7 @@ public class ArmyFSM : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
 
         StartCoroutine(ChangeAttack());
+        
     }
 
     // Update is called once per frame
@@ -321,7 +327,6 @@ public class ArmyFSM : MonoBehaviour
         if (Vector3.Distance(ePoint.position, transform.position) <= 0.7f)
         {
             //충돌처리 발생하지 않도록 취소
-            transform.GetComponent<CharacterController>().enabled = false;
             transform.GetComponent<NavMeshAgent>().enabled = false;
 
             ePoint.GetComponent<ShipMove>().InShip(transform);
@@ -335,13 +340,18 @@ public class ArmyFSM : MonoBehaviour
         //스폰하면 무조건 상태는 IDLE
         ArSt = ArmyState.Idle;
         Debug.Log("첫 시작 대기");
+        //그리고 NavMeshAgent를 활성화 해준다.
+        //transform.GetComponent<NavMeshAgent>().enabled = true;
     }
 
     //랜서에서 상태를 공격으로 바꿔달라고 요청
     protected void ChangeLancerAttack()
     {
         ArSt = ArmyState.Attack;
-        agent.isStopped = true;
+
+        if (!agent.isStopped)
+            agent.isStopped = true;
+
         Debug.Log("All -> 어택");
     }
     //랜서, 아처에서 상태를 공격으로 바꿔달라고 요청

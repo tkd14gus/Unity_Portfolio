@@ -208,9 +208,10 @@ public class EnemyFSM : MonoBehaviour
             
             if (Vector3.Distance(targetArmy.position, transform.position) <= 0.2)
             {
-                Debug.Log("Enemy : 공겨어어어억!");
+                Debug.Log("Enemy : 공겨어어어억! ");
+                
                 //공격력 나중에 처리
-                targetArmy.GetComponent<ArmyFSM>().HP -= 10;
+                targetArmy.parent.GetComponent<HPManager>().HP -= 10;
                 curTime = 0.0f;
                 return;
             }

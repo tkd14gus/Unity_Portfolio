@@ -24,7 +24,19 @@ public class ShipMove : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        target = GetComponentsInChildren<Transform>();
+        //자식의 개수 + 1만큼(자기자신 포함)
+        target = new Transform[transform.childCount + 1];
+
+        //처음은 자기 자신
+        //이부분은 수정 부분임
+        //만들어질 때 target[0]이 본인이 오도록 설계하여
+        //이 부분을 이렇게 유지함.
+        target[0] = transform;
+        for (int i = 1; i < target.Length; i++)
+        {
+            target[i] = transform.GetChild(i - 1);
+        }
+
         //타겟의 위치
         point = target[2].position;
         //방향
