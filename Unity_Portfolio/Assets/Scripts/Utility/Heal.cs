@@ -28,17 +28,27 @@ public class Heal : MonoBehaviour
         //만일 처음 들어온 녀석이면
         if(armyGroup == null)
         {
+            //아래 for문을 돌릴때 사용할 변수
+            //int count = 0;
+
             //부모(ArmyGroup)을 가져온다.
             armyGroup = army.parent.transform;
-            armyArray = armyGroup.GetComponentsInChildren<Transform>();
+            //자식 객체의 개수
+            armyArray = new Transform[armyGroup.childCount];
+            //모든 자식 객체를 가져온다.
+            for (int i = 0; i < armyArray.Length; i++)
+            {
+                armyArray[i] = armyGroup.GetChild(i);
+            }
+
             //healTime은 치료해야할 병사들 숫자 * 1초다.
             //죽더라도 setActive를 false로 해줄것이 아니라 스트립트를 비활성화 하여
             //시체를 남겨둘거기 때문에 원래의 숫자가 나온다.
             healTime = armyGroup.GetComponent<Command>().Num;
 
             //몇마리가 들어와야 하는지 확인
-            //처음 1은 부모고, 자기자신도 합쳐 2를 빼준다.
-            enterNum = armyArray.Length - 2;
+            //딱 자식만 가져왔기 때문에 자기 자신만 빼주면 된다.
+            enterNum = armyArray.Length - 1;
         }
         //처음이 아니면
         else

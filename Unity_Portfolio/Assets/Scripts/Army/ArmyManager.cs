@@ -133,10 +133,22 @@ public class ArmyManager : MonoBehaviour
             //일단 하나밖에 없어서 하나만 케이스에 넣는다.
             case 0:
                 army = Instantiate(armyFactory);
+
+                //BoxMan빼고 전부 비활성화
+                army.GetComponent<ArmyFSM>().enabled = true;
+                army.GetComponent<ArcherFSM>().enabled = false;
+                army.GetComponent<LancerFSM>().enabled = false;
+                army.GetComponent<WorriorFSM>().enabled = false;
+
+                army.transform.Find("BoxMan").gameObject.SetActive(true);
+                army.transform.Find("Archer").gameObject.SetActive(false);
+                army.transform.Find("Lancer").gameObject.SetActive(false);
+                army.transform.Find("Worrior").gameObject.SetActive(false);
+
                 army.transform.position = armyGroup.GetComponentsInChildren<Transform>()[1].position;
                 break;
         }
 
-        army.transform.parent = armyGroup.transform;
+        army.transform.parent = armyGroup.transform.parent;
     }
 }

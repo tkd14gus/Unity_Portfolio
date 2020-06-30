@@ -22,6 +22,7 @@ public class ArmyFSM : MonoBehaviour
         {
             mPoint = value;
             ArSt = ArmyState.Move;
+            agent.isStopped = false;
             print("All -> 무브");
         }
     }
@@ -343,8 +344,8 @@ public class ArmyFSM : MonoBehaviour
         agent.isStopped = true;
         Debug.Log("All -> 어택");
     }
-    //랜서에서 상태를 공격으로 바꿔달라고 요청
-    protected void ChangeLancerIdle()
+    //랜서, 아처에서 상태를 공격으로 바꿔달라고 요청
+    protected void ChangeLAIdle()
     {
         ArSt = ArmyState.Idle;
         Debug.Log("어택 -> 대기");

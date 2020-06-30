@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,8 +19,11 @@ public class Command : MonoBehaviour
         //갈 곳의 위치를 찾는다.
         Vector3 vt = GrassBlockMove.position;
 
-        ArmyFSM[] army = gameObject.GetComponentsInChildren<ArmyFSM>();
+        //무슨 FSM인지
+        ArmyFSM[] army = SelectFSM();
 
+
+        Debug.Log(army.Length);
         army[0].MPOINT = GrassBlockMove.position;
 
         //병사들에게 움직이라고 명령
@@ -35,6 +39,29 @@ public class Command : MonoBehaviour
             army[i].MPOINT = po;
         }
 
+    }
+
+    private ArmyFSM[] SelectFSM()
+    {
+        ArmyFSM[] army = new ArmyFSM[transform.childCount];
+        Debug.Log(transform.GetChild(0).name);
+        switch (transform.GetChild(0).GetComponent<SelectClass>().ArmyClass)
+        {
+            case 0:
+                army = transform.GetComponentsInChildren<ArmyFSM>();
+                break;
+            case 1:
+                army = transform.GetComponentsInChildren<ArcherFSM>();
+                break;
+            case 2:
+                army = transform.GetComponentsInChildren<LancerFSM>();
+                break;
+            case 3:
+                army = transform.GetComponentsInChildren<WorriorFSM>();
+                break;
+        }
+
+        return army;
     }
 
     //치료 받으라고 건물로 이동 명령
@@ -55,16 +82,35 @@ public class Command : MonoBehaviour
     {
         int aClass = 0;
 
-        //armyArray[0]은 armyGroup이다.
-        for (int i = 1; i < armyArray.Length; i++)
+        //armyArray[0]부터 Commander다
+        for (int i = 0; i < armyArray.Length; i++)
         {
             //꺼져있다면 치료중인 녀석들
             //살려준다.
             armyArray[i].gameObject.SetActive(true);
-            armyArray[i].GetComponent<ArmyFSM>().HP = 100;
+
             //병종이 뭔지 확인
-            if (armyArray[i].name.Contains("Army"))
+            if (armyArray[i].name.Contains("BoxMan"))
+            {
+                armyArray[i].GetComponent<ArmyFSM>().HP = 100;
                 aClass = 0;
+            }
+            else if (armyArray[i].name.Contains("Archer"))
+            {
+                armyArray[i].GetComponent<ArcherFSM>().HP = 80;
+                aClass = 1;
+            }
+            else if (armyArray[i].name.Contains("Lancer"))
+            {
+                armyArray[i].GetComponent<LancerFSM>().HP = 100;
+                aClass = 2;
+            }
+            else if (armyArray[i].name.Contains("Worrior"))
+            {
+                armyArray[i].GetComponent<WorriorFSM>().HP = 150;
+                aClass = 3;
+            }
+
             //새로 추가해야 하는 병사를 빼준다.
             count--;
         }

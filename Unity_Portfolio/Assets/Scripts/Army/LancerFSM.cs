@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LanccerFSM : ArmyFSM
+public class LancerFSM : ArmyFSM
 {
     // Start is called before the first frame update
     protected override void Start()
@@ -60,7 +60,6 @@ public class LanccerFSM : ArmyFSM
     //공격중일때 뒤로 물러나면 안된다.
     protected override void Attack()
     {
-        //Vector3 now = transform.position;
         //내가 적을 바라보는 방향
         //적을 내려다보거나 올려보 달때 회전하면서 캐릭터가 함께 움직임.
         //그것을 방지
@@ -79,7 +78,7 @@ public class LanccerFSM : ArmyFSM
             //NavMeshAgent를 다시 쓸 수 있게 해준다.
             agent.isStopped = false;
             //Idle로 바꿔준다.
-            ChangeLancerIdle();
+            ChangeLAIdle();
             //다시 적 찾기 코루틴
             StartCoroutine(ChangeAttack());
             agent.SetDestination(transform.position);
@@ -96,7 +95,7 @@ public class LanccerFSM : ArmyFSM
         //거리가 짧다면
         if (Vector3.Distance(targetEnemy.position, transform.position) < 1.0f)
         {
-            transform.position += transform.forward * -0.5f * Time.deltaTime;
+            transform.position += transform.forward * -0.1f * Time.deltaTime;
             return;
         }
         //넓다면 움직이지 않음
@@ -116,7 +115,7 @@ public class LanccerFSM : ArmyFSM
             if (Vector3.Distance(targetEnemy.position, transform.position) <= 1.5f &&
                 Vector3.Distance(targetEnemy.position, transform.position) >= 0.9f)
             {
-                Debug.Log("Army : 공겨어어어억!");
+                Debug.Log("Lancer : 공겨어어어억!");
                 //공격력 나중에 처리
                 targetEnemy.GetComponent<EnemyFSM>().HP -= 10;
                 targetEnemy.GetComponent<EnemyFSM>().StartPushed(transform);

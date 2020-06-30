@@ -172,7 +172,7 @@ public class ArmyClick : MonoBehaviour
         if(Input.GetMouseButtonDown(1))
         {
             //지휘관과 병사가 눌려있다면
-            if(armyClick && !isClickHouse)
+            if(armyClick && !isClickHouse & !isClickEscape)
             {
                 //레이저
                 //마우스로 클릭한 곳
@@ -229,7 +229,9 @@ public class ArmyClick : MonoBehaviour
     private void Army(RaycastHit hitInfo)
     {
         //먼저 그룹을 선택해준다.
-        anamyGroup = hitInfo.transform.parent.gameObject;
+        //보모의 부모를 선택해야 anamyGroup이 나옴
+        anamyGroup = hitInfo.transform.parent.parent.gameObject;
+        
     }
 
     //모든 house오브젝트들 색깔 바꾸기

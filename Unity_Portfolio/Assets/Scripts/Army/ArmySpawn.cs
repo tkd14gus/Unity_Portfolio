@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,19 +28,22 @@ public class ArmySpawn : MonoBehaviour
     //병사들을 깨우는 함수
     public void AwakeArmy(Vector3 point)
     {
+        //병사들의 직업 선택
+        SelectArmyClass();
+
         //먼저 지휘관 부터 생성
         army[0].SetActive(true);
 
         //상태를 IDLE로 바꿔준다.
-        ArmyFSM af = army[0].GetComponent<ArmyFSM>();
-        af.SpawnState();
+        IDLE(0);
 
         //Y값 조정
-        point.y += 0.15f;
+        //point.y += 0.15f;
         //위치 설정
         army[0].transform.Translate(point);
 
         StartCoroutine(AwakeArmyCoroutine());
+
     }
 
     IEnumerator AwakeArmyCoroutine()
@@ -52,8 +56,7 @@ public class ArmySpawn : MonoBehaviour
             army[i].SetActive(true);
 
             //상태를 IDLE로 바꿔준다.
-            ArmyFSM af = army[i].GetComponent<ArmyFSM>();
-            af.SpawnState();
+            IDLE(i);
 
             //먼저 지휘관 근처로 위치조정을 한번 해준다.
             army[i].transform.Translate(army[0].transform.position);
@@ -67,6 +70,125 @@ public class ArmySpawn : MonoBehaviour
             army[i].transform.Translate(po);
     
             yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private void IDLE(int index)
+    {
+        ArmyFSM af;
+        switch (army[0].GetComponent<SelectClass>().ArmyClass)
+        {
+            //박스맨
+            case 0:
+                af = army[index].GetComponent<ArmyFSM>();
+                af.SpawnState();
+                break;
+            //아처
+            case 1:
+                af = army[index].GetComponent<ArcherFSM>();
+                af.SpawnState();
+                break;
+            //랜서
+            case 2:
+                af = army[index].GetComponent<LancerFSM>();
+                af.SpawnState();
+                break;
+            //워리어
+            case 3:
+                af = army[index].GetComponent<WorriorFSM>();
+                af.SpawnState();
+                break;
+        }
+    }
+
+    private void SelectArmyClass()
+    {
+        switch (army[0].GetComponent<SelectClass>().ArmyClass)
+        {
+            //박스맨
+            case 0:
+                BoxMan();
+                break;
+            //아처
+            case 1:
+                Archer();
+                break;
+            //랜서
+            case 2:
+                Lancer();
+                break;
+            //워리어
+            case 3:
+                Worrior();
+                break;
+        }
+    }
+
+    private void BoxMan()
+    {
+        for (int i = 0; i < army.Length; i++)
+        {
+            //BoxMan빼고 전부 비활성화
+            army[i].GetComponent<ArmyFSM>().enabled = true;
+            army[i].GetComponent<ArcherFSM>().enabled = false;
+            army[i].GetComponent<LancerFSM>().enabled = false;
+            army[i].GetComponent<WorriorFSM>().enabled = false;
+            
+            army[i].transform.Find("BoxMan").gameObject.SetActive(true);
+            army[i].transform.Find("Archer").gameObject.SetActive(false);
+            army[i].transform.Find("Lancer").gameObject.SetActive(false);
+            army[i].transform.Find("Worrior").gameObject.SetActive(false);
+        }
+    }
+
+    private void Archer()
+    {
+        for (int i = 0; i < army.Length; i++)
+        {
+            //Archer빼고 전부 비활성화
+            army[i].GetComponent<ArmyFSM>().enabled = false;
+            army[i].GetComponent<ArcherFSM>().enabled = true;
+            army[i].GetComponent<LancerFSM>().enabled = false;
+            army[i].GetComponent<WorriorFSM>().enabled = false;
+
+            army[i].transform.Find("BoxMan").gameObject.SetActive(false);
+            army[i].transform.Find("Archer").gameObject.SetActive(true);
+            army[i].transform.Find("Lancer").gameObject.SetActive(false);
+            army[i].transform.Find("Worrior").gameObject.SetActive(false);
+        }
+    }
+
+    private void Lancer()
+    {
+        for (int i = 0; i < army.Length; i++)
+        {
+            //Lancer빼고 전부 비활성화
+            army[i].GetComponent<ArmyFSM>().enabled = false;
+            army[i].GetComponent<ArcherFSM>().enabled = false;
+            army[i].GetComponent<LancerFSM>().enabled = true;
+            army[i].GetComponent<WorriorFSM>().enabled = false;
+
+            army[i].transform.Find("BoxMan").gameObject.SetActive(false);
+            army[i].transform.Find("Archer").gameObject.SetActive(false);
+            army[i].transform.Find("Lancer").gameObject.SetActive(true);
+            army[i].transform.Find("Worrior").gameObject.SetActive(false);
+        }
+    }
+
+    private void Worrior()
+    {
+        for (int i = 0; i < army.Length; i++)
+        {
+            //Worrior빼고 전부 비활성화
+            army[i].GetComponent<ArmyFSM>().enabled = false;
+            army[i].GetComponent<ArcherFSM>().enabled = false;
+            army[i].GetComponent<LancerFSM>().enabled = false;
+            army[i].GetComponent<WorriorFSM>().enabled = true;
+
+            army[i].transform.Find("BoxMan").gameObject.SetActive(false);
+            army[i].transform.Find("Archer").gameObject.SetActive(false);
+            army[i].transform.Find("Lancer").gameObject.SetActive(false);
+            army[i].transform.Find("Worrior").gameObject.SetActive(true);
         }
     }
 }

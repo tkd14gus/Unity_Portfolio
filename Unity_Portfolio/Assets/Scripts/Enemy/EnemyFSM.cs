@@ -433,7 +433,7 @@ public class EnemyFSM : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             Vector3 vt = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-            vt += lancer.forward * 5.0f * Time.deltaTime; //뒤로 밀리기
+            vt += lancer.forward * 2.0f * Time.deltaTime; //뒤로 밀리기
 
             transform.position = vt;
 
