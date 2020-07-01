@@ -300,11 +300,26 @@ public class ArmyFSM : MonoBehaviour
     {
         //일단 간단하게
         print("주금");
-        //죽으면 부모에서 떨어트리고
-        transform.parent = null;
         //스크립트를 종료시켜준다
         //후에 코루틴 사용하면 코루틴 후에
-        gameObject.GetComponent<ArmyFSM>().enabled = false;
+        switch (transform.parent.GetChild(0).GetComponent<SelectClass>().ArmyClass)
+        {
+            case 0:
+                gameObject.GetComponent<ArmyFSM>().enabled = false;
+                break;
+            case 1:
+                gameObject.GetComponent<ArcherFSM>().enabled = false;
+                break;
+            case 2:
+                gameObject.GetComponent<LancerFSM>().enabled = false;
+                break;
+            case 3:
+                gameObject.GetComponent<WorriorFSM>().enabled = false;
+                break;
+        }
+        //죽으면 부모에서 떨어트린다
+        transform.parent = null;
+        
     }
 
     private void Heal()

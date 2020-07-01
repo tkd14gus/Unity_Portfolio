@@ -15,7 +15,7 @@ public class TorchlightMove : MonoBehaviour
 
     public Transform Target
     {
-        set { target = value; }
+        set { target = value.GetChild(0); }
     }
 
     // Start is called before the first frame update
@@ -41,14 +41,14 @@ public class TorchlightMove : MonoBehaviour
 
         StartCoroutine(Fa());
 
-        if (Vector3.Distance(target.position, transform.position) <= 0.5f)
+        if (Vector3.Distance(target.position, transform.position) <= 0.8f)
         {
             //바로 사라지게
             downPower = 4.0f;
             StopAllCoroutines();
             gameObject.SetActive(false);
             //그리고 집에 데미지를 준다.
-            BrakeHouse bh = target.GetComponent<BrakeHouse>();
+            BrakeHouse bh = target.parent.GetComponent<BrakeHouse>();
             bh.Damaged();
         }
     }

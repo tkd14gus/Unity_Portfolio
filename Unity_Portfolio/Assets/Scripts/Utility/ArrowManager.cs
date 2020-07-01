@@ -31,7 +31,7 @@ public class ArrowManager : MonoBehaviour
         }
     }
     //최대 화살 개수
-    private int maxArrow = 30;
+    private int maxArrow = 50;
 
     void Awake()
     {

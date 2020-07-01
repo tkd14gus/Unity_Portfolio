@@ -78,6 +78,7 @@ public class ArcherFSM : ArmyFSM
     private void ShootArrow()
     {
         GameObject arrow = ArrowManager.instance.ArrowPool;
+        arrow.GetComponent<MoveArrow>().IsArmy = true;
         arrow.SetActive(true);
         arrow.transform.position = ShootPos.position;
         arrow.transform.forward = transform.forward;

@@ -9,23 +9,23 @@ public class EnemyFSM : MonoBehaviour
     //부셔야 할 집 위치
     //private Transform[] target;
     private List<Transform> target;
-    private NavMeshAgent agent;
+    protected NavMeshAgent agent;
     private CharacterController cc;
 
     private int nearTargetIndex = 0;
     private int nearArmyIndex = 0;
-    private Transform targetArmy;
+    protected Transform targetArmy;
     //횃불
     public GameObject torchlightFactory;
     private GameObject torchlight;
 
     //공격과 공성을 위한 시간
-    private float curTime = 0.0f;
+    protected float curTime = 0.0f;
     private float siegeTime = 2.0f;
-    private float attackTime = 2.5f;
+    protected float attackTime = 2.5f;
 
     //공격과 공성 거리
-    private float attackDis = 1.5f;
+    protected float attackDis = 1.5f;
     private float siegeDis = 1.0f;
 
     enum EnemyState
@@ -35,6 +35,12 @@ public class EnemyFSM : MonoBehaviour
 
     EnemyState es = EnemyState.inShip;
 
+    private int maxHP = 100;
+    public int MaxHP
+    {
+        get { return maxHP; }
+        set { maxHP = value; }
+    }
     private int hp = 100;
     public int HP
     {
@@ -42,13 +48,17 @@ public class EnemyFSM : MonoBehaviour
         set
         {
             hp = value;
-            es = EnemyState.Damaged;
-            print("All -> 데미지드");
+            if (maxHP != value)
+            {
+                es = EnemyState.Damaged;
+                print("All -> 데미지드");
+            }
+            
         }
     }
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         //동적 할당
         target = new List<Transform>();
@@ -61,7 +71,6 @@ public class EnemyFSM : MonoBehaviour
             if (tr[i].name.Contains("HouseTarget"))
                 target.Add(tr[i]);
         }
-
         //네비메쉬에이전트 컴포넌트
         agent = GetComponent<NavMeshAgent>();
         //캐릭터컨트롤러 컴포넌트
@@ -74,7 +83,7 @@ public class EnemyFSM : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         switch (es)
         {
@@ -102,7 +111,7 @@ public class EnemyFSM : MonoBehaviour
         }
     }
 
-    IEnumerator ChangeAttack()
+    protected IEnumerator ChangeAttack()
     {
         while (true)
         {
@@ -113,16 +122,41 @@ public class EnemyFSM : MonoBehaviour
             Collider[] nearArmy = Physics.OverlapSphere(transform.position, attackDis, 1 << 8);
             if (nearArmy.Length != 0)
             {
-                //가까이에 있는 병사 확인
-                targetArmy = nearArmy[0].transform;
+
+                    //가까이에 있는 병사 확인
+                    targetArmy = nearArmy[0].transform;
                 for (int i = 1; i < nearArmy.Length; i++)
                 {
+                    //만일 targetArmy가 죽어있는 상태면 다음 targetArmy를 받아준다.
+                    if (targetArmy.parent.GetComponent<HPManager>().HP <= 0)
+                    {
+                        targetArmy = nearArmy[i].transform;
+                        continue;
+                    }
+
                     if (Vector3.Distance(targetArmy.position, transform.position) > Vector3.Distance(nearArmy[i].transform.position, transform.position))
                     {
                         targetArmy = nearArmy[i].transform;
                         break;
                     }
                 }
+                //아처일 때 레이캐스트로 병사를 맞출 수 있는지 확인한다.
+                //if (transform.name.Contains("Archer"))
+                //{
+                //    //y축 올리기 용
+                //    Vector3 myUpY = transform.position;
+                //    myUpY.y += 0.15f;
+                //    Vector3 yourUpY = targetArmy.position;
+                //    yourUpY.y += 0.15f;
+                //
+                //    Debug.DrawRay(myUpY, (yourUpY - myUpY).normalized, Color.black);
+                //    RaycastHit[] hitInfo;
+                //    hitInfo = Physics.RaycastAll(myUpY, (yourUpY - myUpY).normalized, 3.5f);
+                //    Debug.Log(hitInfo[0].transform.parent.name);
+                //    if (hitInfo.Length != 0 && hitInfo[0].transform.gameObject.layer != LayerMask.NameToLayer("Army"))
+                //        continue;
+                //}
+
                 //확인 했으면 공격
                 //정지하고
                 //일단 바로 공격
@@ -130,6 +164,7 @@ public class EnemyFSM : MonoBehaviour
                 //agent.isStopped = true;
                 agent.velocity = Vector3.zero;
                 es = EnemyState.Attack;
+                Debug.Log("enemy : ALL -> 어택");
                 //골랐으면 녀석이 죽거나 다른 명령이 내려지기 전까지 바뀌지 않는다.
                 break;
             }
@@ -189,11 +224,11 @@ public class EnemyFSM : MonoBehaviour
         //}
     }
 
-    private void Attack()
+    protected virtual void Attack()
     {
 
         //병사 비어있다면 Move 상태로 돌아간다.
-        if (targetArmy == null || targetArmy.gameObject.activeSelf == false)
+        if (targetArmy == null || targetArmy.parent.GetComponent<HPManager>().HP <= 0)
         {
             StartCoroutine(ChangeAttack());
             es = EnemyState.Move;
@@ -318,20 +353,26 @@ public class EnemyFSM : MonoBehaviour
 
     public void CutParent()
     {
-        nearTarget();
+        NearTarget();
 
         StartCoroutine(Disembarkation());
     }
 
     //가장 가까운 타겟 확인
-    private void nearTarget()
+    private void NearTarget()
     {
         //만일 타겟이 이제 없다면
         if (target.Count == 0)
         {
             //그냥 나간다.
+            es = EnemyState.inShip;
             return;
         }
+
+        //만약 사라진 타겟이 마지막 인덱스였다면
+        //인덱스 초과로 오류가 남.
+        //때문에 무조건 0으로 초기화 해준다.
+        nearTargetIndex = 0;
 
         //가장 가까운 타겟 인덱스
         for (int i = 0; i < target.Count; i++)
@@ -339,10 +380,9 @@ public class EnemyFSM : MonoBehaviour
             Vector3 standard = target[nearTargetIndex].position - transform.position;
             Vector3 Check = target[i].position - transform.position;
 
-            if (Vector3.SqrMagnitude(standard) < Vector3.SqrMagnitude(Check))
+            if (Vector3.SqrMagnitude(standard) > Vector3.SqrMagnitude(Check))
             {
                 nearTargetIndex = i;
-                break;
             }
         }
 
@@ -402,7 +442,7 @@ public class EnemyFSM : MonoBehaviour
             target.Remove(target[i]);
 
             //가까운 타겟 리타겟팅
-            nearTarget();
+            NearTarget();
 
             break;
         }
@@ -440,5 +480,12 @@ public class EnemyFSM : MonoBehaviour
 
             yield return new WaitForSeconds(0.01f);
         }
+    }
+
+    protected void ChangeMove()
+    {
+        es = EnemyState.Move;
+        Debug.Log("어택 -> 무브");
+        StartCoroutine(ChangeAttack());
     }
 }
