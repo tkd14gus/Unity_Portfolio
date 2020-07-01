@@ -93,7 +93,7 @@ public class LancerFSM : ArmyFSM
         }
         
         //거리가 짧다면
-        if (Vector3.Distance(targetEnemy.position, transform.position) < 1.0f)
+        if (Vector3.Distance(targetEnemy.position, transform.position) < 0.4f)
         {
             transform.position += transform.forward * -0.1f * Time.deltaTime;
             return;
@@ -112,8 +112,8 @@ public class LancerFSM : ArmyFSM
 
             //랜서는 워리어보다 사정거리가 멀다.
             //대신 가까워도 공격 못한다.
-            if (Vector3.Distance(targetEnemy.position, transform.position) <= 1.5f &&
-                Vector3.Distance(targetEnemy.position, transform.position) >= 0.9f)
+            if (Vector3.Distance(targetEnemy.position, transform.position) <= 0.7f &&
+                Vector3.Distance(targetEnemy.position, transform.position) >= 0.4f)
             {
                 Debug.Log("Lancer : 공겨어어어억!");
                 //공격력 나중에 처리

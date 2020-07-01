@@ -12,7 +12,7 @@ public class ArcherEnemyFSM : EnemyFSM
         base.Start();   
         MaxHP = 80;
         HP = 80;
-        attackDis = 3.0f;
+        attackDis = 4.0f;
         attackTime = 4.0f;
     }
 
@@ -25,7 +25,6 @@ public class ArcherEnemyFSM : EnemyFSM
     //궁수는 물러서지 않고 제자리에서 계속 발사한다.
     protected override void Attack()
     {
-        agent.SetDestination(transform.position);
         //내가 적을 바라보는 방향
         //적을 내려다보거나 올려볼 때 회전하면서 캐릭터가 함께 움직임.
         //그것을 방지
@@ -53,6 +52,7 @@ public class ArcherEnemyFSM : EnemyFSM
             //아처는 탐색 범위와 공격 범위가 같다.
             if (Vector3.Distance(targetArmy.position, transform.position) <= attackDis)
             {
+                anim.SetTrigger("Attack");
                 Debug.Log("EnemyArcher : 공겨어어어억!");
                 //공격력 나중에 처리
                 //아처는 화살을 쏘아냄
@@ -78,13 +78,14 @@ public class ArcherEnemyFSM : EnemyFSM
         //높이 던질 힘 계산
         //음수가 나오면 타겟의 위치가 더 높음
         //양수가 나오면 본인의 위치가 더 높음
-        float height = targetArmy.position.y - ShootPos.position.y;
+        //float height = targetArmy.position.y - ShootPos.position.y;
 
         ShootPos.LookAt(targetArmy);
         GameObject arrow = ArrowManager.instance.ArrowPool;
-        arrow.GetComponent<MoveArrow>().IsArmy = false;
         arrow.SetActive(true);
-        arrow.GetComponent<MoveArrow>().Pwoer = height;
+        arrow.GetComponent<MoveArrow>().IsArmy = false;
+        //이정도 파워가 딱 적당함
+        arrow.GetComponent<MoveArrow>().Speed = Vector3.Distance(targetArmy.position, ShootPos.position) / 2.5f;
         arrow.transform.position = ShootPos.position;
         arrow.transform.forward = ShootPos.forward;
         //명중률이 그렇게 좋지는 않음
@@ -92,9 +93,9 @@ public class ArcherEnemyFSM : EnemyFSM
         //                                            ShootPos.rotation.y + Random.Range(0.0f, 0.1f),
         //                                            ShootPos.rotation.z + Random.Range(-0.1f, 0.1f));
         Vector3 ro = targetArmy.position - ShootPos.position;
-        ro.x += Random.Range(-1.0f, 1.0f);
-        ro.y += Random.Range(5.0f, 10.0f);
-        ro.z += Random.Range(-1.0f, 1.0f);
+        //ro.x += Random.Range(-1.0f, 1.0f);
+        //ro.y += Random.Range(5.0f, 10.0f);
+        //ro.z += Random.Range(-1.0f, 1.0f);
         arrow.transform.Rotate(ro);
     }
 }

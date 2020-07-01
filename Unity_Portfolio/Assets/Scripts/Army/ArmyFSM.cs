@@ -373,6 +373,8 @@ public class ArmyFSM : MonoBehaviour
     protected void ChangeLAIdle()
     {
         ArSt = ArmyState.Idle;
+        StopAllCoroutines();
+        StartCoroutine(ChangeAttack());
         Debug.Log("어택 -> 대기");
     }
 

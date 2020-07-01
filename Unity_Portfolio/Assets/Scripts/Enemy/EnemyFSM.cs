@@ -11,6 +11,7 @@ public class EnemyFSM : MonoBehaviour
     private List<Transform> target;
     protected NavMeshAgent agent;
     private CharacterController cc;
+    protected Animator anim;
 
     private int nearTargetIndex = 0;
     private int nearArmyIndex = 0;
@@ -28,12 +29,13 @@ public class EnemyFSM : MonoBehaviour
     protected float attackDis = 1.5f;
     private float siegeDis = 1.0f;
 
+
     enum EnemyState
     {
-        inShip, Move, Attack, Defence, Siege, Damaged, Die
+        Inship, Move, Attack, Defence, Siege, Damaged, Die
     }
 
-    EnemyState es = EnemyState.inShip;
+    EnemyState es = EnemyState.Inship;
 
     private int maxHP = 100;
     public int MaxHP
@@ -52,6 +54,7 @@ public class EnemyFSM : MonoBehaviour
             {
                 es = EnemyState.Damaged;
                 print("All -> 데미지드");
+                anim.SetTrigger("Damaged");
             }
             
         }
@@ -75,6 +78,7 @@ public class EnemyFSM : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         //캐릭터컨트롤러 컴포넌트
         cc = GetComponent<CharacterController>();
+        anim = GetComponentInChildren<Animator>();
 
         //횃불
         torchlight = Instantiate(torchlightFactory);
@@ -87,8 +91,8 @@ public class EnemyFSM : MonoBehaviour
     {
         switch (es)
         {
-            case EnemyState.inShip:
-                InShip();
+            case EnemyState.Inship:
+                Inship();
                 break;
             case EnemyState.Move:
                 Move();
@@ -123,8 +127,9 @@ public class EnemyFSM : MonoBehaviour
             if (nearArmy.Length != 0)
             {
 
-                    //가까이에 있는 병사 확인
-                    targetArmy = nearArmy[0].transform;
+                //가까이에 있는 병사 확인
+                targetArmy = nearArmy[0].transform;
+
                 for (int i = 1; i < nearArmy.Length; i++)
                 {
                     //만일 targetArmy가 죽어있는 상태면 다음 targetArmy를 받아준다.
@@ -140,55 +145,33 @@ public class EnemyFSM : MonoBehaviour
                         break;
                     }
                 }
-                //아처일 때 레이캐스트로 병사를 맞출 수 있는지 확인한다.
-                //if (transform.name.Contains("Archer"))
-                //{
-                //    //y축 올리기 용
-                //    Vector3 myUpY = transform.position;
-                //    myUpY.y += 0.15f;
-                //    Vector3 yourUpY = targetArmy.position;
-                //    yourUpY.y += 0.15f;
-                //
-                //    Debug.DrawRay(myUpY, (yourUpY - myUpY).normalized, Color.black);
-                //    RaycastHit[] hitInfo;
-                //    hitInfo = Physics.RaycastAll(myUpY, (yourUpY - myUpY).normalized, 3.5f);
-                //    Debug.Log(hitInfo[0].transform.parent.name);
-                //    if (hitInfo.Length != 0 && hitInfo[0].transform.gameObject.layer != LayerMask.NameToLayer("Army"))
-                //        continue;
-                //}
 
                 //확인 했으면 공격
                 //정지하고
                 //일단 바로 공격
-                curTime = attackTime;
+                //curTime = attackTime;
                 //agent.isStopped = true;
                 agent.velocity = Vector3.zero;
                 es = EnemyState.Attack;
                 Debug.Log("enemy : ALL -> 어택");
+                StopAllCoroutines();
+                //아처일 때 코루틴을 한개 더 실행해준다.
+                if (transform.name.Contains("Archer"))
+                {
+                    agent.SetDestination(transform.position);
+                    StartCoroutine(MoveTarget());
+                }
                 //골랐으면 녀석이 죽거나 다른 명령이 내려지기 전까지 바뀌지 않는다.
+                
+
                 break;
             }
         }
     }
 
-    private void InShip()
+    private void Inship()
     {
-        //if (transform.parent == null)
-        //{
-        //    RaycastHit[] hitInfo;
-        //
-        //    hitInfo = Physics.RaycastAll(transform.position, transform.up * -1, 2.0f);
-        //
-        //    if (hitInfo.Length > 0 &&  hitInfo[0].transform.parent.name.Contains("Grass Block Move"))
-        //    {
-        //        agent.enabled = true;
-        //        //상태를 Move로 바꿔준다. 
-        //        es = EnemyState.Move;
-        //        return;
-        //    }
-        //
-        //    cc.Move(transform.forward * 1.5f * Time.deltaTime);
-        //}
+
     }
 
     private void Move()
@@ -202,9 +185,11 @@ public class EnemyFSM : MonoBehaviour
         {
             //일단 바로 횃불
             curTime = 2.0f;
-            agent.isStopped = true;
-            agent.velocity = Vector3.zero;
+            agent.SetDestination(transform.position);
+            StopAllCoroutines();
             es = EnemyState.Siege;
+            Debug.Log("enemy : Move -> Siege");
+            anim.SetTrigger("Siege");
         }
     }
 
@@ -232,6 +217,7 @@ public class EnemyFSM : MonoBehaviour
         {
             StartCoroutine(ChangeAttack());
             es = EnemyState.Move;
+            anim.SetTrigger("Move");
             return;
         }
 
@@ -243,6 +229,7 @@ public class EnemyFSM : MonoBehaviour
             
             if (Vector3.Distance(targetArmy.position, transform.position) <= 0.2)
             {
+                anim.SetTrigger("Attack");
                 Debug.Log("Enemy : 공겨어어어억! ");
                 
                 //공격력 나중에 처리
@@ -280,6 +267,7 @@ public class EnemyFSM : MonoBehaviour
             Vector3 vt = transform.position - (transform.position - targetArmy.position).normalized * 0.2f;
             //이동
             agent.SetDestination(vt);
+            anim.SetTrigger("Move");
             //0.4초 후
             yield return new WaitForSeconds(0.3f);
             //0.4초동안 움직임을 막아준다.
@@ -302,11 +290,22 @@ public class EnemyFSM : MonoBehaviour
         curTime += Time.deltaTime;
         if (curTime >= siegeTime)
         {
+            //if (Vector3.Distance(transform.position, target[nearTargetIndex].position) > 2.0f)
+            if(!target[nearTargetIndex].gameObject.activeSelf)
+            {
+                //다시 타겟 찾아주고
+                NearTarget();
+                es = EnemyState.Move;
+                anim.SetTrigger("Move");
+                StopAllCoroutines();
+                StartCoroutine(ChangeAttack());
+                return;
+            }
             torchlight.SetActive(true);
             torchlight.transform.position = transform.position;
             //Vector3 dir = (target[nearTargetIndex].position - transform.position).normalized;
             torchlight.transform.LookAt(target[nearTargetIndex].position);
-
+            anim.SetTrigger("Siege");
             curTime = 0.0f;
 
         }
@@ -317,6 +316,7 @@ public class EnemyFSM : MonoBehaviour
         if (hp > 0)
         {
             StartCoroutine(DamagedMotion());
+            anim.SetTrigger("Damaged");
         }
         else
             es = EnemyState.Die;
@@ -330,8 +330,9 @@ public class EnemyFSM : MonoBehaviour
         //아직 배에 타고 있다면 그냥 계속 배에 타고 있어라.
         if (transform.parent != null)
         {
-            es = EnemyState.inShip;
+            es = EnemyState.Inship;
             print("데미지드 -> 인쉽");
+            anim.SetTrigger("Inship");
         }
         else
         {
@@ -340,6 +341,7 @@ public class EnemyFSM : MonoBehaviour
             //적을 찾는 코루틴도 함께 실행해준다.
             StartCoroutine(ChangeAttack());
             print("데미지드 -> 무브");
+            anim.SetTrigger("Move");
         }
     }
 
@@ -348,7 +350,8 @@ public class EnemyFSM : MonoBehaviour
         //일단 간단하게
         print("주금");
         gameObject.SetActive(false);
-        es = EnemyState.Attack;
+        es = EnemyState.Die;
+        anim.SetTrigger("Die");
     }
 
     public void CutParent()
@@ -365,7 +368,8 @@ public class EnemyFSM : MonoBehaviour
         if (target.Count == 0)
         {
             //그냥 나간다.
-            es = EnemyState.inShip;
+            es = EnemyState.Inship;
+            anim.SetTrigger("Inship");
             return;
         }
 
@@ -377,6 +381,8 @@ public class EnemyFSM : MonoBehaviour
         //가장 가까운 타겟 인덱스
         for (int i = 0; i < target.Count; i++)
         {
+            if (!target[i].gameObject.activeSelf) continue;
+
             Vector3 standard = target[nearTargetIndex].position - transform.position;
             Vector3 Check = target[i].position - transform.position;
 
@@ -422,6 +428,7 @@ public class EnemyFSM : MonoBehaviour
             agent.enabled = true;
             //상태를 Move로 바꿔준다. 
             es = EnemyState.Move;
+            anim.SetTrigger("Move");
             return true;
         }
         
@@ -450,8 +457,9 @@ public class EnemyFSM : MonoBehaviour
         //만일 타겟이 이제 없다면
         if (target.Count == 0)
         {
-            //임시로 Damaged로 바꿔주고
-            es = EnemyState.Damaged;
+            //임시로 Inship로 바꿔주고
+            es = EnemyState.Inship;
+            anim.SetTrigger("InShip");
             //그냥 나간다.
             return;
         }
@@ -460,6 +468,9 @@ public class EnemyFSM : MonoBehaviour
         agent.isStopped = false;
         //다시 이동
         es = EnemyState.Move;
+        anim.SetTrigger("Move");
+        //적을 발견하면 싸우도록
+        StartCoroutine(ChangeAttack());
     }
 
     public void StartPushed(Transform lancer)
@@ -485,7 +496,39 @@ public class EnemyFSM : MonoBehaviour
     protected void ChangeMove()
     {
         es = EnemyState.Move;
+        anim.SetTrigger("Move");
         Debug.Log("어택 -> 무브");
         StartCoroutine(ChangeAttack());
+    }
+
+    //아처가 슬금슬금 목적지로 가는 코루틴
+    IEnumerator MoveTarget()
+    {
+        while (true)
+        {
+            //일단 Siege로 바꿀 수 있는지 확인.
+            if (Vector3.Distance(target[nearTargetIndex].position, transform.position) <= siegeDis)
+            {
+                //일단 바로 횃불
+                curTime = 2.0f;
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+                es = EnemyState.Siege;
+                anim.SetTrigger("Siege");
+            }
+
+            //2초에 한번씩
+            yield return new WaitForSeconds(2.0f);
+            //목적지로 조금씩 움직인다.
+            agent.SetDestination(target[nearTargetIndex].position);
+            anim.SetTrigger("Move");
+            //0.2초동안
+            yield return new WaitForSeconds(0.3f);
+            //그 후엔 자기자리
+            agent.SetDestination(transform.position);
+
+            if (Vector3.Distance(transform.position, targetArmy.position) < 2.0f)
+                break;
+        }
     }
 }

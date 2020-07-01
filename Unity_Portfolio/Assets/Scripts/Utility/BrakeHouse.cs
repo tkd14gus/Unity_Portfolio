@@ -21,11 +21,15 @@ public class BrakeHouse : MonoBehaviour
 
         if(hp < 0)
         {
+            EnemyFSM ef;
             for (int i = 0; i < enemy.Length; i++)
             {
                 if (enemy[i].activeSelf == false) continue;
 
-                EnemyFSM ef = enemy[i].GetComponent<EnemyFSM>();
+                if (enemy[i].name.Contains("Archer"))
+                    ef = enemy[i].GetComponent<ArcherEnemyFSM>();
+                else
+                    ef = enemy[i].GetComponent<EnemyFSM>();
                 //삭제 함수 호출
                 ef.TargetDelet(transform);
             }
