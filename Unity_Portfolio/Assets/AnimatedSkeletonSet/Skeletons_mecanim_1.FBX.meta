@@ -324,12 +324,22 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: "\nClip 'Take 001' has import animation warnings that
+      might lower retargeting quality:\nNote: Activate translation DOF on avatar
+      to improve retargeting quality.\n\t'CATSpine2' is inbetween humanoid transforms
+      and has rotation animation that will be discarded.\n\t'CATLFingers2' has scale
+      animation that will be discarded.\n\t'CATLThumb2' has scale animation that
+      will be discarded.\n\t'CATRForearm' has scale animation that will be discarded.\n\t'CATRFingers1'
+      has scale animation that will be discarded.\n\t'CATRFingers2' has scale animation
+      that will be discarded.\n\t'CATRThumb2' has scale animation that will be discarded.\n\t'CATLCalf'
+      has scale animation that will be discarded.\n\t'CATLFoot' has scale animation
+      that will be discarded.\n\t'CATRigLLegDigit11' has scale animation that will
+      be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 1
+    animationCompression: 3
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5

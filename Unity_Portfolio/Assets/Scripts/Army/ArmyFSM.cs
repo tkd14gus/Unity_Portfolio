@@ -12,6 +12,7 @@ public class ArmyFSM : MonoBehaviour
 
     protected NavMeshAgent agent;
     protected Transform targetEnemy;
+    protected Animator anim;
 
     //움직일 곳
     private Vector3 mPoint;
@@ -23,6 +24,7 @@ public class ArmyFSM : MonoBehaviour
             mPoint = value;
             ArSt = ArmyState.Move;
             agent.isStopped = false;
+            anim.SetTrigger("Move");
             print("All -> 무브");
         }
     }
@@ -37,6 +39,8 @@ public class ArmyFSM : MonoBehaviour
             //모든 코루틴(체인지어택만 스탑해도 안됨.) 스탑.
             StopAllCoroutines();
             ArSt = ArmyState.Heal;
+            //건물까지 뛰어가야 함
+            anim.SetTrigger("Move");
             print("All -> 힐");
         }
     }
@@ -52,6 +56,8 @@ public class ArmyFSM : MonoBehaviour
             //모든 코루틴(체인지어택만 스탑해도 안됨.) 스탑.
             StopAllCoroutines();
             ArSt = ArmyState.Escape;
+            //배까지 뛰어가야 함
+            anim.SetTrigger("Move");
             print("All -> 탈출");
         }
     }
@@ -104,6 +110,7 @@ public class ArmyFSM : MonoBehaviour
         //speed = Random.Range(2.3f, 2.8f);
         cc = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
+        anim = transform.GetChild(0).GetComponent<Animator>();
 
         StartCoroutine(ChangeAttack());
         
@@ -136,6 +143,7 @@ public class ArmyFSM : MonoBehaviour
                 Escape();
                 break;
         }
+        curTime += Time.deltaTime;
     }
 
     protected virtual IEnumerator ChangeAttack()
@@ -151,8 +159,15 @@ public class ArmyFSM : MonoBehaviour
             {
                 //가까이에 있는 병사 확인
                 targetEnemy = nearEnemy[0].transform;
+
                 for (int i = 0; i < nearEnemy.Length; i++)
                 {
+                    //만일 nearEnemy가 죽어있는 상태면 다음 nearEnemy를 받아준다.
+                    if (targetEnemy.GetComponent<EnemyHPManager>().HP <= 0)
+                    {
+                        targetEnemy = nearEnemy[i].transform;
+                        continue;
+                    }
                     if (Vector3.Distance(targetEnemy.position, transform.position) > Vector3.Distance(nearEnemy[i].transform.position, transform.position))
                     {
                         targetEnemy = nearEnemy[i].transform;
@@ -161,7 +176,7 @@ public class ArmyFSM : MonoBehaviour
                 //확인 했으면 공격
                 //정지하고
                 //일단 바로 공격
-                curTime = attackTime;
+                //curTime = attackTime;
                 //agent.isStopped = true;
                 agent.velocity = Vector3.zero;
                 ArSt = ArmyState.Attack;
@@ -177,7 +192,7 @@ public class ArmyFSM : MonoBehaviour
 
     private void Idle()
     {
-
+        anim.SetTrigger("Idle");
     }
 
     private void Move()
@@ -191,6 +206,7 @@ public class ArmyFSM : MonoBehaviour
         if (Vector3.Distance(mPoint, transform.position) <= 0.7f)
         {
             ArSt = ArmyState.Idle;
+            anim.SetTrigger("Idle");
             Debug.Log("무브 -> 대기");
         }
 
@@ -199,11 +215,12 @@ public class ArmyFSM : MonoBehaviour
     protected virtual void Attack()
     {
         //적이 비어있다면 대기 상태로 돌아간다.
-        if(targetEnemy == null || targetEnemy.gameObject.activeSelf == false)
+        if(targetEnemy.gameObject.activeSelf == false || targetEnemy.GetComponent<EnemyHPManager>().HP <= 0)
         {
             StartCoroutine(ChangeAttack());
             ArSt = ArmyState.Idle;
             Debug.Log("어택 -> 대기");
+            anim.SetTrigger("Idle");
             agent.SetDestination(transform.position);
             return;
         }
@@ -223,13 +240,14 @@ public class ArmyFSM : MonoBehaviour
            //속도 조절은 나중에 하자
            agent.SetDestination(targetEnemy.position);
            
-           if (Vector3.Distance(targetEnemy.position, transform.position) <= 0.5)
+           if (Vector3.Distance(targetEnemy.position, transform.position) <= 0.25)
            {
-             Debug.Log("Army : 공겨어어어억!");
-             //공격력 나중에 처리
-             targetEnemy.GetComponent<EnemyFSM>().HP -= 10;
-             curTime = 0.0f;
-             return;
+                anim.SetTrigger("Attack");
+                Debug.Log("Army : 공겨어어어억!");
+                //공격력 나중에 처리
+                targetEnemy.GetComponent<EnemyHPManager>().HP -= 10;
+                curTime = 0.0f;
+                return;
            }
 
         }
@@ -245,7 +263,7 @@ public class ArmyFSM : MonoBehaviour
             }
         }
         
-        curTime += Time.deltaTime;
+        //curTime += Time.deltaTime;
     }
 
     //물러서는 코루틴
@@ -263,6 +281,7 @@ public class ArmyFSM : MonoBehaviour
             Vector3 vt = transform.position - (transform.position - targetEnemy.position).normalized * 0.2f;
             //이동
             agent.SetDestination(vt);
+            anim.SetTrigger("Move");
             //0.4초 후
             yield return new WaitForSeconds(0.3f);
             //0.4초동안 움직임을 막아준다.
@@ -283,21 +302,25 @@ public class ArmyFSM : MonoBehaviour
         else
         {
             ArSt = ArmyState.Die;
-            Debug.Log("All -> 대기");
+            Debug.Log("All -> 죽음");
         }
     }
 
     IEnumerator DamagedMotion()
     {
+        anim.SetTrigger("Damaged");
         //애니메이션 시간.
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.1f);
 
-        ArSt = ArmyState.Attack;
-        print("데미지드 -> 어택");
+        ArSt = ArmyState.Idle;
+        anim.SetTrigger("Idle");
+        print("데미지드 -> 대기");
+        StartCoroutine(ChangeAttack());
     }
 
     private void Die()
     {
+        anim.SetTrigger("Die");
         //일단 간단하게
         print("주금");
         //스크립트를 종료시켜준다
@@ -330,6 +353,7 @@ public class ArmyFSM : MonoBehaviour
         //다 이동했으면 일단 비활성화 해준다.
         if (Vector3.Distance(hPoint.position, transform.position) <= 0.5f)
         {
+            anim.SetTrigger("Idle");
             hPoint.parent.GetComponent<Heal>().ArmyHeal(transform);
         }
     }
@@ -341,6 +365,7 @@ public class ArmyFSM : MonoBehaviour
         //배에 태워준다.
         if (Vector3.Distance(ePoint.position, transform.position) <= 0.7f)
         {
+            anim.SetTrigger("Idle");
             //충돌처리 발생하지 않도록 취소
             transform.GetComponent<NavMeshAgent>().enabled = false;
 
@@ -375,6 +400,7 @@ public class ArmyFSM : MonoBehaviour
         ArSt = ArmyState.Idle;
         StopAllCoroutines();
         StartCoroutine(ChangeAttack());
+        anim.SetTrigger("Idle");
         Debug.Log("어택 -> 대기");
     }
 

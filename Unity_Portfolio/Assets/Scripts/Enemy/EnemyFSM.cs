@@ -37,7 +37,7 @@ public class EnemyFSM : MonoBehaviour
 
     EnemyState es = EnemyState.Inship;
 
-    private int maxHP = 100;
+    private int maxHP;
     public int MaxHP
     {
         get { return maxHP; }
@@ -52,11 +52,19 @@ public class EnemyFSM : MonoBehaviour
             hp = value;
             if (maxHP != value)
             {
-                es = EnemyState.Damaged;
-                print("All -> 데미지드");
-                anim.SetTrigger("Damaged");
+                if (hp <= 0)
+                {
+                    es = EnemyState.Die;
+                    print("All -> 다이");
+                    anim.SetTrigger("Die");
+                }
+                else
+                {
+                    es = EnemyState.Damaged;
+                    print("All -> 데미지드");
+                    anim.SetTrigger("Damaged");
+                }
             }
-            
         }
     }
 
@@ -113,6 +121,7 @@ public class EnemyFSM : MonoBehaviour
                 Die();
                 break;
         }
+        curTime += Time.deltaTime;
     }
 
     protected IEnumerator ChangeAttack()
@@ -126,8 +135,8 @@ public class EnemyFSM : MonoBehaviour
             Collider[] nearArmy = Physics.OverlapSphere(transform.position, attackDis, 1 << 8);
             if (nearArmy.Length != 0)
             {
-
                 //가까이에 있는 병사 확인
+
                 targetArmy = nearArmy[0].transform;
 
                 for (int i = 1; i < nearArmy.Length; i++)
@@ -151,7 +160,7 @@ public class EnemyFSM : MonoBehaviour
                 //일단 바로 공격
                 //curTime = attackTime;
                 //agent.isStopped = true;
-                agent.velocity = Vector3.zero;
+                agent.SetDestination(transform.position);
                 es = EnemyState.Attack;
                 Debug.Log("enemy : ALL -> 어택");
                 StopAllCoroutines();
@@ -163,7 +172,6 @@ public class EnemyFSM : MonoBehaviour
                 }
                 //골랐으면 녀석이 죽거나 다른 명령이 내려지기 전까지 바뀌지 않는다.
                 
-
                 break;
             }
         }
@@ -171,11 +179,12 @@ public class EnemyFSM : MonoBehaviour
 
     private void Inship()
     {
-
+        anim.SetTrigger("InShip");
     }
 
     private void Move()
     {
+        anim.SetTrigger("Move");
         //위치까지 이동하고
         agent.SetDestination(target[nearTargetIndex].position);
 
@@ -189,7 +198,6 @@ public class EnemyFSM : MonoBehaviour
             StopAllCoroutines();
             es = EnemyState.Siege;
             Debug.Log("enemy : Move -> Siege");
-            anim.SetTrigger("Siege");
         }
     }
 
@@ -211,9 +219,20 @@ public class EnemyFSM : MonoBehaviour
 
     protected virtual void Attack()
     {
+        //내가 적을 바라보는 방향
+        //적을 내려다보거나 올려보 달때 회전하면서 캐릭터가 함께 움직임.
+        //그것을 방지
+        Vector3 e = targetArmy.position;
+        e.y = 0;
+        Vector3 a = transform.position;
+        a.y = 0;
+        Vector3 dir = (e - a).normalized;
+        //시선처리
+        Quaternion q = Quaternion.LookRotation(dir);
+        transform.rotation = q;
 
         //병사 비어있다면 Move 상태로 돌아간다.
-        if (targetArmy == null || targetArmy.parent.GetComponent<HPManager>().HP <= 0)
+        if (targetArmy.parent.GetComponent<HPManager>().HP <= 0)
         {
             StartCoroutine(ChangeAttack());
             es = EnemyState.Move;
@@ -235,23 +254,14 @@ public class EnemyFSM : MonoBehaviour
                 //공격력 나중에 처리
                 targetArmy.parent.GetComponent<HPManager>().HP -= 10;
                 curTime = 0.0f;
+                //그리고 뒤로 슬금슬금 물러나 준다.
+                StartCoroutine(MoveOff());
                 return;
             }
 
         }
-        //작다면 슬금슬금 물러선다.
-        else
-        {
-            if (curTime == 0.0f)
-            {
-                //켜져있을지도 모르니까 꺼주고
-                //StopCoroutine(MoveOff());
-                //다시 실행
-                StartCoroutine(MoveOff());
-            }
-        }
 
-        curTime += Time.deltaTime;
+        //curTime += Time.deltaTime;
     }
 
     //물러서는 코루틴
@@ -264,17 +274,16 @@ public class EnemyFSM : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             //뒤로 이동을 위한 캐스팅
-            Vector3 vt = transform.position - (transform.position - targetArmy.position).normalized * 0.2f;
+            Vector3 vt = transform.forward * -0.2f;
             //이동
             agent.SetDestination(vt);
             anim.SetTrigger("Move");
             //0.4초 후
             yield return new WaitForSeconds(0.3f);
             //0.4초동안 움직임을 막아준다.
-            agent.isStopped = true;
+            agent.SetDestination(transform.position);
             yield return new WaitForSeconds(0.4f);
             i++;
-            agent.isStopped = false;
 
         }
         
@@ -287,28 +296,23 @@ public class EnemyFSM : MonoBehaviour
 
     private void Siege()
     {
-        curTime += Time.deltaTime;
+        //curTime += Time.deltaTime;
         if (curTime >= siegeTime)
         {
-            //if (Vector3.Distance(transform.position, target[nearTargetIndex].position) > 2.0f)
-            if(!target[nearTargetIndex].gameObject.activeSelf)
-            {
-                //다시 타겟 찾아주고
-                NearTarget();
-                es = EnemyState.Move;
-                anim.SetTrigger("Move");
-                StopAllCoroutines();
-                StartCoroutine(ChangeAttack());
-                return;
-            }
+            anim.SetTrigger("Siege");
             torchlight.SetActive(true);
             torchlight.transform.position = transform.position;
-            //Vector3 dir = (target[nearTargetIndex].position - transform.position).normalized;
             torchlight.transform.LookAt(target[nearTargetIndex].position);
-            anim.SetTrigger("Siege");
             curTime = 0.0f;
-
+            StartCoroutine(abc());
         }
+    }
+
+    IEnumerator abc()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        anim.ResetTrigger("Siege");
     }
 
     private void Damaged()
@@ -324,6 +328,7 @@ public class EnemyFSM : MonoBehaviour
 
     IEnumerator DamagedMotion()
     {
+        anim.SetTrigger("Damaged");
         //애니메이션 시간.
         yield return new WaitForSeconds(0.3f);
 
@@ -350,8 +355,6 @@ public class EnemyFSM : MonoBehaviour
         //일단 간단하게
         print("주금");
         gameObject.SetActive(false);
-        es = EnemyState.Die;
-        anim.SetTrigger("Die");
     }
 
     public void CutParent()
@@ -407,7 +410,7 @@ public class EnemyFSM : MonoBehaviour
             if (DisembarkationF())
                 break;
         }
-
+        
         //걸을 수 있는 곳으로 나와야지만
         //부모관계를 끊어준다.
         transform.parent = null;
@@ -469,13 +472,17 @@ public class EnemyFSM : MonoBehaviour
         //다시 이동
         es = EnemyState.Move;
         anim.SetTrigger("Move");
+        Debug.Log("시즈 -> 무브");
         //적을 발견하면 싸우도록
         StartCoroutine(ChangeAttack());
     }
 
     public void StartPushed(Transform lancer)
     {
-        StartCoroutine(Pushed(lancer));
+        Vector3 vt = transform.position;
+        vt += lancer.forward * 0.3f; //뒤로 밀리기
+
+        transform.position = vt;
     }
 
     //랜서 공격에 맞으면 뒤로 밀린다.
@@ -514,7 +521,6 @@ public class EnemyFSM : MonoBehaviour
                 agent.isStopped = true;
                 agent.velocity = Vector3.zero;
                 es = EnemyState.Siege;
-                anim.SetTrigger("Siege");
             }
 
             //2초에 한번씩
@@ -531,4 +537,13 @@ public class EnemyFSM : MonoBehaviour
                 break;
         }
     }
+
+    //IEnumerator animMove()
+    //{
+    //    while (true)
+    //    {
+    //        anim.SetTrigger("Move");
+    //        yield return new WaitForSeconds(0.3f);
+    //    }
+    //}
 }

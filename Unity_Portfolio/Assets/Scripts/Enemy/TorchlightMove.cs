@@ -33,7 +33,7 @@ public class TorchlightMove : MonoBehaviour
     private void Move()
     {
         //중력 작용
-        downPower -= 0.25f;
+        downPower -= 0.5f;
         Vector3 g = new Vector3(0, 1 + downPower, 0);
 
         transform.position += transform.forward * speed * Time.deltaTime;
@@ -41,7 +41,7 @@ public class TorchlightMove : MonoBehaviour
 
         StartCoroutine(Fa());
 
-        if (Vector3.Distance(target.position, transform.position) <= 0.8f)
+        if (Vector3.Distance(target.position, transform.position) <= 0.45f)
         {
             //바로 사라지게
             downPower = 4.0f;
