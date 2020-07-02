@@ -34,7 +34,7 @@ public class LancerFSM : ArmyFSM
             //근데 자식 클래스에선 enum문을 가져올 수 없다.
             //부모 클래스에서 확인해주자.
             if (!CheckIdle())
-                StopAllCoroutines();
+                StopCoroutine(ChangeAttack());
             
             //주변에 가장 가까운 Enemy찾기
             //주변에 Enemy가 있는지를 확인할 때 사용하는 변수
@@ -63,11 +63,10 @@ public class LancerFSM : ArmyFSM
                 //curTime = attackTime;
                 //agent.isStopped = true;
                 ChangeLancerAttack();
-                
                 //랜서는 언제나 가장 가까이에 있는 적을 공격해야 한다.
                 //골랐으면 녀석이 죽거나 다른 명령이 내려지기 전까지 바뀌지 않는다.
                 //break;
-            }
+        }
         //}
     }
 
@@ -88,7 +87,7 @@ public class LancerFSM : ArmyFSM
         transform.rotation = q;
 
         //적이 비어있다면 대기 상태로 돌아간다.
-        if (targetEnemy.gameObject.activeSelf == false || targetEnemy.GetComponent<EnemyHPManager>().HP <= 0)
+        if (targetEnemy.GetComponent<EnemyHPManager>().HP <= 0)
         {
             //NavMeshAgent를 다시 쓸 수 있게 해준다.
             agent.isStopped = false;
@@ -116,11 +115,6 @@ public class LancerFSM : ArmyFSM
             transform.position += transform.forward * -0.1f * Time.deltaTime;
             return;
         }
-        //넓다면 움직이지 않음
-        else
-        {
-
-        }
 
         //transform.rotation = Quaternion.Euler((targetEnemy.position - transform.position).normalized);
         //크다면 공격
@@ -134,9 +128,6 @@ public class LancerFSM : ArmyFSM
                 Vector3.Distance(targetEnemy.position, transform.position) >= 0.3f)
             {
                 anim.SetTrigger("Attack");
-                //StartCoroutine(ExitAttack());
-                Debug.Log("Lancer : 공겨어어어억!");
-                //공격력 나중에 처리
                 targetEnemy.GetComponent<EnemyHPManager>().HP -= 5;
                 targetEnemy.GetComponent<EnemyHPManager>().StartPushed(transform);
                 curTime = 0.0f;
@@ -144,8 +135,6 @@ public class LancerFSM : ArmyFSM
             }
 
         }
-
-        //curTime += Time.deltaTime;
     }
 
     IEnumerator ExitAttack()

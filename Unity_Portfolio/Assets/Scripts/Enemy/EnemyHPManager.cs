@@ -10,7 +10,7 @@ public class EnemyHPManager : MonoBehaviour
     public int HP
     {
         get { return efs.HP; }
-        set { efs.HP = value; Debug.Log("efs : " + efs.HP); }
+        set { efs.HP = value; }
     }
     public int MaxHP
     {

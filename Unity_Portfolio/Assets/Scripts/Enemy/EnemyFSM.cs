@@ -52,15 +52,20 @@ public class EnemyFSM : MonoBehaviour
             hp = value;
             if (maxHP != value)
             {
+                if (es == EnemyState.Die)
+                    return;
+
                 if (hp <= 0)
                 {
                     es = EnemyState.Die;
+                    Die();
                     print("All -> 다이");
                     anim.SetTrigger("Die");
                 }
                 else
                 {
                     es = EnemyState.Damaged;
+                    Damaged();
                     print("All -> 데미지드");
                     anim.SetTrigger("Damaged");
                 }
@@ -97,6 +102,8 @@ public class EnemyFSM : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        if (hp <= 0)
+            es = EnemyState.Die;
         switch (es)
         {
             case EnemyState.Inship:
@@ -331,30 +338,48 @@ public class EnemyFSM : MonoBehaviour
         anim.SetTrigger("Damaged");
         //애니메이션 시간.
         yield return new WaitForSeconds(0.3f);
-
-        //아직 배에 타고 있다면 그냥 계속 배에 타고 있어라.
-        if (transform.parent != null)
+        if (es != EnemyState.Die)
         {
-            es = EnemyState.Inship;
-            print("데미지드 -> 인쉽");
-            anim.SetTrigger("Inship");
-        }
-        else
-        {
-            //범위가 맞지 않는 화살공격일 수 있으니 무브로 바꿔준다.
-            es = EnemyState.Move;
-            //적을 찾는 코루틴도 함께 실행해준다.
-            StartCoroutine(ChangeAttack());
-            print("데미지드 -> 무브");
-            anim.SetTrigger("Move");
+            //아직 배에 타고 있다면 그냥 계속 배에 타고 있어라.
+            if (transform.parent != null)
+            {
+                es = EnemyState.Inship;
+                print("데미지드 -> 인쉽");
+                anim.SetTrigger("Inship");
+            }
+            else
+            {
+                //범위가 맞지 않는 화살공격일 수 있으니 무브로 바꿔준다.
+                es = EnemyState.Move;
+                //적을 찾는 코루틴도 함께 실행해준다.
+                StartCoroutine(ChangeAttack());
+                print("데미지드 -> 무브");
+                anim.SetTrigger("Move");
+            }
         }
     }
 
     private void Die()
     {
-        //일단 간단하게
-        print("주금");
-        gameObject.SetActive(false);
+        
+        anim.SetTrigger("Die");
+        StartCoroutine(DieLater());
+    }
+    IEnumerator DieLater()
+    {
+        yield return new WaitForSeconds(0.1f);
+        //스크립트 종료시키고, 컬리더와 네비를 종료한다.
+        if (transform.name.Contains("Archer"))
+        {
+            transform.GetComponent<ArcherEnemyFSM>().enabled = false;
+        }
+        else
+        {
+            transform.GetComponent<EnemyFSM>().enabled = false;
+        }
+
+        cc.enabled = false;
+        agent.enabled = false;
     }
 
     public void CutParent()

@@ -16,7 +16,7 @@ public class WorriorFSM : ArmyFSM
     protected override void Start()
     {
         base.Start();
-        shild = transform.Find("skill01").Find("polySurface29").gameObject;
+        shild = transform.Find("Worrior").Find("skill01").Find("polySurface29").gameObject;
     }
 
     protected override void Update()
@@ -29,17 +29,16 @@ public class WorriorFSM : ArmyFSM
     {
         int i = 1;
 
-        Collider[] nearEnemy = Physics.OverlapSphere(transform.position, 2.0f, 1 << 9);
+        Collider[] nearEnemy = Physics.OverlapSphere(transform.position, 5.0f, 1 << 9);
         if (nearEnemy.Length != 0)
         {
             for (i = 0; i < nearEnemy.Length; i++)
             {
                 if (nearEnemy[i].name.Contains("EnemyArcher"))
                 {
+                    //디팬스로 바꿔준다.
                     isDefence = true;
                     Defence();
-                    //디팬스로 바꿔준다.
-                    Debug.Log("디팬스 On!");
                     break;
                 }
             }
@@ -48,10 +47,9 @@ public class WorriorFSM : ArmyFSM
         //주변에 적이 없거나 길이가 주변에 Archer가 없다면 디팬스 off
         if (nearEnemy.Length == 0 || nearEnemy.Length == i)
         {
+            //디팬스로 바꿔준다.
             isDefence = false;
             Defence();
-            //디팬스로 바꿔준다.
-            Debug.Log("디팬스 Off!");
         }
     }
 

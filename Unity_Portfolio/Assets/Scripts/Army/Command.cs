@@ -21,9 +21,6 @@ public class Command : MonoBehaviour
 
         //무슨 FSM인지
         ArmyFSM[] army = SelectFSM();
-
-
-        Debug.Log(army.Length);
         army[0].MPOINT = GrassBlockMove.position;
 
         //병사들에게 움직이라고 명령
@@ -44,11 +41,17 @@ public class Command : MonoBehaviour
     private ArmyFSM[] SelectFSM()
     {
         ArmyFSM[] army = new ArmyFSM[transform.childCount];
-        Debug.Log(transform.GetChild(0).name);
         switch (transform.GetChild(0).GetComponent<SelectClass>().ArmyClass)
         {
             case 0:
-                army = transform.GetComponentsInChildren<ArmyFSM>();
+                //그냥 ArmyFSM으로 받으면 상속받은 다른 FSM들도 들어와짐.
+                //때문에 0, 4, 8... 순으로 받기 때문에 그것에 맞춰 넣어준다.
+                ArmyFSM[] temp = transform.GetComponentsInChildren<ArmyFSM>();
+                for (int i = 0; i < temp.Length; i += 4)
+                {
+                    army[i / 4] = temp[i];
+                }
+                
                 break;
             case 1:
                 army = transform.GetComponentsInChildren<ArcherFSM>();
@@ -60,7 +63,6 @@ public class Command : MonoBehaviour
                 army = transform.GetComponentsInChildren<WorriorFSM>();
                 break;
         }
-
         return army;
     }
 
@@ -81,41 +83,33 @@ public class Command : MonoBehaviour
     public void HealComeOut(int count, Transform place, ref Transform[] armyArray)
     {
         int aClass = 0;
-
+        aClass = armyArray[0].GetComponent<SelectClass>().armyClass;
         //armyArray[0]부터 Commander다
         for (int i = 0; i < armyArray.Length; i++)
         {
             //꺼져있다면 치료중인 녀석들
             //살려준다.
             armyArray[i].gameObject.SetActive(true);
-
-            //병종이 뭔지 확인
-            if (armyArray[i].name.Contains("BoxMan"))
+            switch (aClass)
             {
-                armyArray[i].GetComponent<ArmyFSM>().HP = 100;
-                aClass = 0;
-            }
-            else if (armyArray[i].name.Contains("Archer"))
-            {
-                armyArray[i].GetComponent<ArcherFSM>().HP = 80;
-                aClass = 1;
-            }
-            else if (armyArray[i].name.Contains("Lancer"))
-            {
-                armyArray[i].GetComponent<LancerFSM>().HP = 100;
-                aClass = 2;
-            }
-            else if (armyArray[i].name.Contains("Worrior"))
-            {
-                armyArray[i].GetComponent<WorriorFSM>().HP = 150;
-                aClass = 3;
+                case 0:
+                    armyArray[i].GetComponent<ArmyFSM>().HP = armyArray[i].GetComponent<ArmyFSM>().MaxHP;
+                    break;
+                case 1:
+                    armyArray[i].GetComponent<ArcherFSM>().HP = armyArray[i].GetComponent<ArcherFSM>().MaxHP;
+                    break;
+                case 2:
+                    armyArray[i].GetComponent<LancerFSM>().HP = armyArray[i].GetComponent<LancerFSM>().MaxHP;
+                    break;
+                case 3:
+                    armyArray[i].GetComponent<WorriorFSM>().HP = armyArray[i].GetComponent<WorriorFSM>().MaxHP;
+                    break;
             }
 
             //새로 추가해야 하는 병사를 빼준다.
             count--;
         }
 
-        print(count);
         //필요한 만큼 병사들을 instaiate해준다.
         for (int i = 0; i < count; i++)
         {
@@ -127,9 +121,30 @@ public class Command : MonoBehaviour
 
         //갈 곳의 위치를 찾는다.
         Vector3 vt = place.position;
-
-        ArmyFSM[] army = gameObject.GetComponentsInChildren<ArmyFSM>();
-
+        ArmyFSM[] army = new ArmyFSM[transform.childCount];
+        switch (aClass)
+        {
+            case 0:
+                //그냥 ArmyFSM으로 받으면 상속받은 다른 FSM들도 들어와짐.
+                //때문에 0, 4, 8... 순으로 받기 때문에 그것에 맞춰 넣어준다.
+                ArmyFSM[] temp = transform.GetComponentsInChildren<ArmyFSM>();
+                for (int i = 0; i < temp.Length; i += 4)
+                {
+                    army[i / 4] = temp[i];
+                }
+                break;
+            case 1:
+                army = gameObject.GetComponentsInChildren<ArcherFSM>();
+                break;
+            case 2:
+                army = gameObject.GetComponentsInChildren<LancerFSM>();
+                break;
+            case 3:
+                army = gameObject.GetComponentsInChildren<WorriorFSM>();
+                break;
+        }
+        
+        Debug.Log("l : " + army.Length);
         army[0].MPOINT = place.position;
 
         //병사들에게 움직이라고 명령

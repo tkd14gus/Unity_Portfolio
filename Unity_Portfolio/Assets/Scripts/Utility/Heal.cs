@@ -78,7 +78,6 @@ public class Heal : MonoBehaviour
         {
             yield return new WaitForSeconds((healTime / healTime) / 2.0f); // 0.5초에 한번씩 눈으로 보여준다.
             persent += healTime / 2.0f;
-            print("+" + healTime / 2.0f);
 
             if (persent >= 100)
                 break;

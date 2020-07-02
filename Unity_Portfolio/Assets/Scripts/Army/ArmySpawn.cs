@@ -34,14 +34,14 @@ public class ArmySpawn : MonoBehaviour
 
         //먼저 지휘관 부터 생성
         army[0].SetActive(true);
-
+        
         //위치 설정
         army[0].transform.position = point;
-
-        army[0].GetComponent<NavMeshAgent>().enabled = true;
-
+        
         //상태를 IDLE로 바꿔준다.
         IDLE(0);
+
+        army[0].GetComponent<NavMeshAgent>().enabled = true;
 
         //Y값 조정
         //point.y += 0.1f;
@@ -58,11 +58,11 @@ public class ArmySpawn : MonoBehaviour
         {
             //깨워주고
             army[i].SetActive(true);
-
-            army[i].GetComponent<NavMeshAgent>().enabled = true;
-
+            
             //상태를 IDLE로 바꿔준다.
             IDLE(i);
+
+            army[i].GetComponent<NavMeshAgent>().enabled = true;
 
             //먼저 지휘관 근처로 위치조정을 한번 해준다.
             army[i].transform.Translate(army[0].transform.position);
@@ -87,21 +87,29 @@ public class ArmySpawn : MonoBehaviour
             //박스맨
             case 0:
                 af = army[index].GetComponent<ArmyFSM>();
+                //겸사 애니메이터도 컴포넌트 해준다.
+                af.GetAnim();
                 af.SpawnState();
                 break;
             //아처
             case 1:
                 af = army[index].GetComponent<ArcherFSM>();
+                //겸사 애니메이터도 컴포넌트 해준다.
+                af.GetAnim();
                 af.SpawnState();
                 break;
             //랜서
             case 2:
                 af = army[index].GetComponent<LancerFSM>();
+                //겸사 애니메이터도 컴포넌트 해준다.
+                af.GetAnim();
                 af.SpawnState();
                 break;
             //워리어
             case 3:
                 af = army[index].GetComponent<WorriorFSM>();
+                //겸사 애니메이터도 컴포넌트 해준다.
+                af.GetAnim();
                 af.SpawnState();
                 break;
         }

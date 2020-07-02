@@ -52,8 +52,8 @@ public class ArcherEnemyFSM : EnemyFSM
             //아처는 탐색 범위와 공격 범위가 같다.
             if (Vector3.Distance(targetArmy.position, transform.position) <= attackDis)
             {
+                Debug.Log("rhdrur!");
                 anim.SetTrigger("Attack");
-                Debug.Log("EnemyArcher : 공겨어어어억!");
                 //공격력 나중에 처리
                 //아처는 화살을 쏘아냄
                 ShootArrow();
@@ -69,8 +69,6 @@ public class ArcherEnemyFSM : EnemyFSM
             }
 
         }
-
-        curTime += Time.deltaTime;
     }
 
     private void ShootArrow()

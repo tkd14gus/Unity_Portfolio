@@ -23,8 +23,8 @@ public class ArmyFSM : MonoBehaviour
         {
             mPoint = value;
             ArSt = ArmyState.Move;
-            agent.isStopped = false;
-            anim.SetTrigger("Move");
+            //StopAllCoroutines();
+            //agent.isStopped = false;
             print("All -> 무브");
         }
     }
@@ -40,7 +40,7 @@ public class ArmyFSM : MonoBehaviour
             StopAllCoroutines();
             ArSt = ArmyState.Heal;
             //건물까지 뛰어가야 함
-            anim.SetTrigger("Move");
+            //anim.SetTrigger("Move");
             print("All -> 힐");
         }
     }
@@ -57,7 +57,7 @@ public class ArmyFSM : MonoBehaviour
             StopAllCoroutines();
             ArSt = ArmyState.Escape;
             //배까지 뛰어가야 함
-            anim.SetTrigger("Move");
+            //anim.SetTrigger("Move");
             print("All -> 탈출");
         }
     }
@@ -73,12 +73,18 @@ public class ArmyFSM : MonoBehaviour
         get { return hp; }
         set
         {
-            if (value == 100)
+            if (value == MaxHP)
             {
                 hp = value;
             }
             else
             {
+                //지휘관이면
+                //병사들이 모두 죽기 전까지 데미지를 받지 않는다.
+                if (transform.name.Contains("Commander") &&
+                    transform.parent.childCount != 1)
+                    return;
+
                 if (ArSt == ArmyState.Heal || ArSt == ArmyState.Escape)
                 {
                     hp = value;
@@ -86,9 +92,23 @@ public class ArmyFSM : MonoBehaviour
                 }
                 else
                 {
-                    hp = value;
-                    ArSt = ArmyState.Damaged;
-                    print("All -> 데미지드");
+                    if (ArSt == ArmyState.Die)
+                        return;
+
+                    if (hp > 0)
+                    {
+                        hp = value;
+                        ArSt = ArmyState.Damaged;
+                        Damaged();
+                        print("All -> 데미지드");
+                    }
+                    else
+                    {
+                        hp = 0;
+                        ArSt = ArmyState.Die;
+                        Die();
+                        print("All -> 다이");
+                    }
                 }
             }
         }
@@ -110,7 +130,7 @@ public class ArmyFSM : MonoBehaviour
         //speed = Random.Range(2.3f, 2.8f);
         cc = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
-        anim = transform.GetChild(0).GetComponent<Animator>();
+        //anim = transform.GetChild(0).GetComponent<Animator>();
 
         StartCoroutine(ChangeAttack());
         
@@ -119,6 +139,8 @@ public class ArmyFSM : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        if (hp <= 0)
+            ArSt = ArmyState.Die;
         switch (ArSt)
         {
             case ArmyState.Idle:
@@ -130,9 +152,9 @@ public class ArmyFSM : MonoBehaviour
             case ArmyState.Attack:
                 Attack();
                 break;
-            case ArmyState.Damaged:
-                Damaged();
-                break;
+            //case ArmyState.Damaged:
+            //    Damaged();
+            //    break;
             case ArmyState.Die:
                 Die();
                 break;
@@ -197,6 +219,8 @@ public class ArmyFSM : MonoBehaviour
 
     private void Move()
     {
+        Debug.Log(anim);
+        anim.SetTrigger("Move");
         //위치까지 이동하고
         //cc.Move(dir * speed * Time.deltaTime);
         agent.SetDestination(mPoint);
@@ -215,7 +239,7 @@ public class ArmyFSM : MonoBehaviour
     protected virtual void Attack()
     {
         //적이 비어있다면 대기 상태로 돌아간다.
-        if(targetEnemy.gameObject.activeSelf == false || targetEnemy.GetComponent<EnemyHPManager>().HP <= 0)
+        if(targetEnemy.GetComponent<EnemyHPManager>().HP <= 0)
         {
             StartCoroutine(ChangeAttack());
             ArSt = ArmyState.Idle;
@@ -295,23 +319,14 @@ public class ArmyFSM : MonoBehaviour
 
     private void Damaged()
     {
-        if (hp > 0)
-        {
-            StartCoroutine(DamagedMotion());
-        }
-        else
-        {
-            ArSt = ArmyState.Die;
-            Debug.Log("All -> 죽음");
-        }
+        anim.SetTrigger("Damaged");
+        StartCoroutine(DamagedMotion());
     }
 
     IEnumerator DamagedMotion()
     {
-        anim.SetTrigger("Damaged");
         //애니메이션 시간.
         yield return new WaitForSeconds(0.1f);
-
         ArSt = ArmyState.Idle;
         anim.SetTrigger("Idle");
         print("데미지드 -> 대기");
@@ -321,32 +336,39 @@ public class ArmyFSM : MonoBehaviour
     private void Die()
     {
         anim.SetTrigger("Die");
-        //일단 간단하게
-        print("주금");
         //스크립트를 종료시켜준다
-        //후에 코루틴 사용하면 코루틴 후에
-        switch (transform.parent.GetChild(0).GetComponent<SelectClass>().ArmyClass)
-        {
-            case 0:
-                gameObject.GetComponent<ArmyFSM>().enabled = false;
-                break;
-            case 1:
-                gameObject.GetComponent<ArcherFSM>().enabled = false;
-                break;
-            case 2:
-                gameObject.GetComponent<LancerFSM>().enabled = false;
-                break;
-            case 3:
-                gameObject.GetComponent<WorriorFSM>().enabled = false;
-                break;
-        }
+        //Debug.Log(transform.parent.GetChild(0).GetComponent<SelectClass>().ArmyClass);
+        //switch (transform.parent.GetChild(0).GetComponent<SelectClass>().ArmyClass)
+        //{
+        //    case 0:
+        //        gameObject.GetComponent<ArmyFSM>().enabled = false;
+        //        break;
+        //    case 1:
+        //        gameObject.GetComponent<ArcherFSM>().enabled = false;
+        //        break;
+        //    case 2:
+        //        gameObject.GetComponent<LancerFSM>().enabled = false;
+        //        break;
+        //    case 3:
+        //        gameObject.GetComponent<WorriorFSM>().enabled = false;
+        //        break;
+        //}
+        //그냥 다 종료
+        gameObject.GetComponent<ArmyFSM>().enabled = false;
+        gameObject.GetComponent<ArcherFSM>().enabled = false;
+        gameObject.GetComponent<LancerFSM>().enabled = false;
+        gameObject.GetComponent<WorriorFSM>().enabled = false;
+
+        //뺄거 다 빼준다.
+        transform.GetChild(0).GetComponent<CapsuleCollider>().enabled = false;
+        agent.enabled = false;
         //죽으면 부모에서 떨어트린다
         transform.parent = null;
-        
     }
 
     private void Heal()
     {
+        anim.SetTrigger("Move");
         agent.SetDestination(hPoint.position);
 
 
@@ -360,6 +382,7 @@ public class ArmyFSM : MonoBehaviour
 
     private void Escape()
     {
+        anim.SetTrigger("Move");
         agent.SetDestination(ePoint.position);
 
         //배에 태워준다.
@@ -382,13 +405,33 @@ public class ArmyFSM : MonoBehaviour
         Debug.Log("첫 시작 대기");
         //그리고 NavMeshAgent를 활성화 해준다.
         //transform.GetComponent<NavMeshAgent>().enabled = true;
+
     }
 
-    //랜서에서 상태를 공격으로 바꿔달라고 요청
-    protected void ChangeLancerAttack()
+    public void GetAnim()
     {
-        ArSt = ArmyState.Attack;
+        for (int i = 0; i < 4; i++)
+        {
+            if (transform.GetChild(i).gameObject.activeSelf)
+            {
+                //열려있는 자식객체에서 애니메이터를 받아와준다.
+                anim = transform.GetChild(i).GetComponent<Animator>();
+                break;
+            }
+        }
+        
+    }
 
+        //랜서에서 상태를 공격으로 바꿔달라고 요청
+        protected void ChangeLancerAttack()
+    {
+        //랜서는 대기가 아니라면 공격으로 못 바꾼다.
+        //여기서 다시 한 번 더 확인
+        if (ArSt != ArmyState.Idle)
+            return;
+
+        ArSt = ArmyState.Attack;
+        
         if (!agent.isStopped)
             agent.isStopped = true;
 

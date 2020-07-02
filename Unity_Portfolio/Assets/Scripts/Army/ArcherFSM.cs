@@ -10,8 +10,10 @@ public class ArcherFSM : ArmyFSM
     protected override void Start()
     {
         base.Start();
-        
-        attackDis = 3.0f;
+        MaxHP = 80;
+        HP = 80;
+        attackDis = 4.0f;
+        attackTime = 4.0f;
     }
 
     // Update is called once per frame
@@ -36,7 +38,7 @@ public class ArcherFSM : ArmyFSM
         transform.rotation = q;
 
         //적이 비어있다면 대기 상태로 돌아간다.
-        if (targetEnemy == null || targetEnemy.gameObject.activeSelf == false)
+        if (targetEnemy.GetComponent<EnemyHPManager>().HP <= 0)
         {
             StartCoroutine(ChangeAttack());
             ChangeLAIdle();
@@ -60,7 +62,7 @@ public class ArcherFSM : ArmyFSM
 
             if (Vector3.Distance(targetEnemy.position, transform.position) <= attackDis)
             {
-                Debug.Log("Archer : 공겨어어어억!");
+                anim.SetTrigger("Attack");
                 //공격력 나중에 처리
                 //아처는 화살을 쏘아냄
                 //targetEnemy.GetComponent<EnemyFSM>().HP -= 20;
@@ -71,20 +73,26 @@ public class ArcherFSM : ArmyFSM
             }
 
         }
-
-        curTime += Time.deltaTime;
     }
 
     private void ShootArrow()
     {
+        ShootPos.LookAt(targetEnemy);
         GameObject arrow = ArrowManager.instance.ArrowPool;
-        arrow.GetComponent<MoveArrow>().IsArmy = true;
         arrow.SetActive(true);
+        arrow.GetComponent<MoveArrow>().IsArmy = false;
+        //이정도 파워가 딱 적당함
+        arrow.GetComponent<MoveArrow>().Speed = Vector3.Distance(targetEnemy.position, ShootPos.position) / 2.5f;
         arrow.transform.position = ShootPos.position;
-        arrow.transform.forward = transform.forward;
+        arrow.transform.forward = ShootPos.forward;
         //명중률이 그렇게 좋지는 않음
-        arrow.transform.rotation = Quaternion.Euler(arrow.transform.rotation.x + Random.Range(-0.1f, 0.1f),
-                                                    arrow.transform.rotation.y + Random.Range(0.0f, 0.1f),
-                                                    arrow.transform.rotation.z + Random.Range(-0.1f, 0.1f));
+        //arrow.transform.rotation = Quaternion.Euler(ShootPos.rotation.x + Random.Range(-0.1f, 0.1f),
+        //                                            ShootPos.rotation.y + Random.Range(0.0f, 0.1f),
+        //                                            ShootPos.rotation.z + Random.Range(-0.1f, 0.1f));
+        Vector3 ro = targetEnemy.position - ShootPos.position;
+        //ro.x += Random.Range(-1.0f, 1.0f);
+        //ro.y += Random.Range(5.0f, 10.0f);
+        //ro.z += Random.Range(-1.0f, 1.0f);
+        arrow.transform.Rotate(ro);
     }
 }

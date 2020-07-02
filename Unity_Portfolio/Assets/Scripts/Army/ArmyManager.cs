@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class ArmyManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class ArmyManager : MonoBehaviour
 
     //병사 팩토리
     public GameObject armyFactory;
+
     //1마리의 지휘관은 8마리의 병사를 가지고 있다.
     private int maxArmy = 8;
 
@@ -145,10 +147,80 @@ public class ArmyManager : MonoBehaviour
                 army.transform.Find("Lancer").gameObject.SetActive(false);
                 army.transform.Find("Worrior").gameObject.SetActive(false);
 
+                army.GetComponent<ArmyFSM>().HP = army.GetComponent<ArmyFSM>().MaxHP;
+
+                //상태를 Idle로 바꿔주고, anim을 받아준다.
+                army.GetComponent<ArmyFSM>().SpawnState();
+                army.GetComponent<ArmyFSM>().GetAnim();
+                army.transform.position = armyGroup.GetComponentsInChildren<Transform>()[1].position;
+                break;
+            case 1:
+                army = Instantiate(armyFactory);
+
+                //Archer빼고 전부 비활성화
+                army.GetComponent<ArmyFSM>().enabled = false;
+                army.GetComponent<ArcherFSM>().enabled = true;
+                army.GetComponent<LancerFSM>().enabled = false;
+                army.GetComponent<WorriorFSM>().enabled = false;
+
+                army.transform.Find("BoxMan").gameObject.SetActive(false);
+                army.transform.Find("Archer").gameObject.SetActive(true);
+                army.transform.Find("Lancer").gameObject.SetActive(false);
+                army.transform.Find("Worrior").gameObject.SetActive(false);
+
+                army.GetComponent<ArcherFSM>().HP = army.GetComponent<ArcherFSM>().MaxHP;
+
+                //상태를 Idle로 바꿔주고, anim을 받아준다.
+                army.GetComponent<ArcherFSM>().SpawnState();
+                army.GetComponent<ArcherFSM>().GetAnim();
+                army.transform.position = armyGroup.GetComponentsInChildren<Transform>()[1].position;
+                break;
+            case 2:
+                army = Instantiate(armyFactory);
+
+                //Archer빼고 전부 비활성화
+                army.GetComponent<ArmyFSM>().enabled = false;
+                army.GetComponent<ArcherFSM>().enabled = false;
+                army.GetComponent<LancerFSM>().enabled = true;
+                army.GetComponent<WorriorFSM>().enabled = false;
+
+                army.transform.Find("BoxMan").gameObject.SetActive(false);
+                army.transform.Find("Archer").gameObject.SetActive(false);
+                army.transform.Find("Lancer").gameObject.SetActive(true);
+                army.transform.Find("Worrior").gameObject.SetActive(false);
+
+                army.GetComponent<LancerFSM>().HP = army.GetComponent<LancerFSM>().MaxHP;
+
+                //상태를 Idle로 바꿔주고, anim을 받아준다.
+                army.GetComponent<LancerFSM>().SpawnState();
+                army.GetComponent<LancerFSM>().GetAnim();
+                army.transform.position = armyGroup.GetComponentsInChildren<Transform>()[1].position;
+                break;
+            case 3:
+                army = Instantiate(armyFactory);
+
+                //Archer빼고 전부 비활성화
+                army.GetComponent<ArmyFSM>().enabled = false;
+                army.GetComponent<ArcherFSM>().enabled = false;
+                army.GetComponent<LancerFSM>().enabled = false;
+                army.GetComponent<WorriorFSM>().enabled = true;
+
+                army.transform.Find("BoxMan").gameObject.SetActive(false);
+                army.transform.Find("Archer").gameObject.SetActive(false);
+                army.transform.Find("Lancer").gameObject.SetActive(false);
+                army.transform.Find("Worrior").gameObject.SetActive(true);
+
+                army.GetComponent<WorriorFSM>().HP = army.GetComponent<WorriorFSM>().MaxHP;
+
+                //상태를 Idle로 바꿔주고, anim을 받아준다.
+                army.GetComponent<WorriorFSM>().SpawnState();
+                army.GetComponent<WorriorFSM>().GetAnim();
                 army.transform.position = armyGroup.GetComponentsInChildren<Transform>()[1].position;
                 break;
         }
 
+        //네비매쉬에이전트도 켜준다.
+        army.GetComponent<NavMeshAgent>().enabled = true;
         army.transform.parent = armyGroup.transform.parent;
     }
 }

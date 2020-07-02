@@ -35,8 +35,6 @@ public class MoveArrow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-
         Move();
         CrashCheck();
     }
@@ -92,8 +90,12 @@ public class MoveArrow : MonoBehaviour
                 {
                     //1 << 8은 병사임
                     if (nearObject[i].gameObject.layer == LayerMask.NameToLayer("Army"))
-                    {              
-                        nearObject[i].transform.parent.GetComponent<HPManager>().HP -= 20;
+                    {
+                        //워리어는 원거리에 대한 면역력이 있음
+                        if (nearObject[i].name.Contains("Worrior"))
+                            nearObject[i].transform.parent.GetComponent<HPManager>().HP -= 5;
+                        else
+                            nearObject[i].transform.parent.GetComponent<HPManager>().HP -= 20;
 
                         StopAllCoroutines();
                         ArrowManager.instance.ArrowPool = gameObject;
