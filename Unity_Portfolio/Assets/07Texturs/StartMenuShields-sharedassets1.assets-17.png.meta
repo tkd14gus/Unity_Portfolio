@@ -1,0 +1,248 @@
+fileFormatVersion: 2
+guid: c980e2ed9a66ec24cbab3d6296c8a7b3
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7565348318905424973
+    second: StartMenuShields-sharedassets1.assets-17_0
+  - first:
+      213: -1244181623628624980
+    second: StartMenuShields-sharedassets1.assets-17_1
+  - first:
+      213: -2215441587702872171
+    second: StartMenuShields-sharedassets1.assets-17_2
+  - first:
+      213: 6488788594085414231
+    second: StartMenuShields-sharedassets1.assets-17_3
+  - first:
+      213: 3113978712076841029
+    second: StartMenuShields-sharedassets1.assets-17_4
+  - first:
+      213: -1682838034689675473
+    second: StartMenuShields-sharedassets1.assets-17_5
+  - first:
+      213: -5250327811731211891
+    second: StartMenuShields-sharedassets1.assets-17_6
+  - first:
+      213: 4318578487201649313
+    second: StartMenuShields-sharedassets1.assets-17_7
+  - first:
+      213: 8389047594606714577
+    second: StartMenuShields-sharedassets1.assets-17_8
+  - first:
+      213: -1455965643320001453
+    second: StartMenuShields-sharedassets1.assets-17_9
+  - first:
+      213: -4489713504783150457
+    second: StartMenuShields-sharedassets1.assets-17_10
+  - first:
+      213: 6268172259002632906
+    second: StartMenuShields-sharedassets1.assets-17_11
+  - first:
+      213: -4425415676372966612
+    second: StartMenuShields-sharedassets1.assets-17_12
+  - first:
+      213: -5676375906584556698
+    second: StartMenuShields-sharedassets1.assets-17_13
+  - first:
+      213: -620680859124643772
+    second: StartMenuShields-sharedassets1.assets-17_14
+  - first:
+      213: 7279033773929038051
+    second: StartMenuShields-sharedassets1.assets-17_15
+  - first:
+      213: -3386996394545212558
+    second: StartMenuShields-sharedassets1.assets-17_16
+  - first:
+      213: -5733214573651790727
+    second: StartMenuShields-sharedassets1.assets-17_17
+  - first:
+      213: -2772825492506209413
+    second: StartMenuShields-sharedassets1.assets-17_18
+  - first:
+      213: -5552395087726696169
+    second: StartMenuShields-sharedassets1.assets-17_19
+  - first:
+      213: -5951698818670728947
+    second: StartMenuShields-sharedassets1.assets-17_20
+  - first:
+      213: -3524354666187429334
+    second: StartMenuShields-sharedassets1.assets-17_21
+  - first:
+      213: -5302628650326697657
+    second: StartMenuShields-sharedassets1.assets-17_22
+  - first:
+      213: -7646534579529660324
+    second: StartMenuShields-sharedassets1.assets-17_23
+  - first:
+      213: 3061044675579751483
+    second: StartMenuShields-sharedassets1.assets-17_24
+  - first:
+      213: 6146150620076500675
+    second: StartMenuShields-sharedassets1.assets-17_25
+  - first:
+      213: 2272596275667923477
+    second: StartMenuShields-sharedassets1.assets-17_26
+  - first:
+      213: -1629139436331041659
+    second: StartMenuShields-sharedassets1.assets-17_27
+  - first:
+      213: 7868849874557855669
+    second: StartMenuShields-sharedassets1.assets-17_28
+  - first:
+      213: 5616651581624622119
+    second: StartMenuShields-sharedassets1.assets-17_29
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: 1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: -1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: StartMenuShields-sharedassets1.assets-17_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 8
+        width: 256
+        height: 248
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b32b8179cb720790800000000000000
+      internalID: -7565348318905424973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StartMenuShields-sharedassets1.assets-17_1
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 8
+        width: 256
+        height: 248
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cab0c8fb767cbbee0800000000000000
+      internalID: -1244181623628624980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
