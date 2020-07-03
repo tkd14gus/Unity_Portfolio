@@ -42,7 +42,7 @@ public class BrakeHouse : MonoBehaviour
             }
             isBreak = true;
             //색상 변경
-            gameObject.GetComponentInChildren<Material>().color = Color.black;
+            transform.GetChild(0).GetComponent<MeshRenderer>().material.color = new Color(0, 0, 0);
         }
     }
 }

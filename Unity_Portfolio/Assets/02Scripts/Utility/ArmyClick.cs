@@ -254,7 +254,9 @@ public class ArmyClick : MonoBehaviour
             Transform[] ch = houses[i].GetComponentsInChildren<Transform>();
             //자식의 색을 바꿔준다.
             //본인은 0, 자식은 1번 인덱스
-            ch[1].GetComponent<MeshRenderer>().material.color = new Color(0, 255, 0);
+            //만일 검은 색이 아니라면
+            if (ch[1].GetComponent<MeshRenderer>().material.color != new Color(0, 0, 0))
+                ch[1].GetComponent<MeshRenderer>().material.color = new Color(0, 255, 0);
         }
     }
 

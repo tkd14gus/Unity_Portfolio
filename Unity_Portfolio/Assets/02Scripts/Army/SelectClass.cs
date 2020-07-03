@@ -12,4 +12,12 @@ public class SelectClass : MonoBehaviour
         get { return armyClass; }
         set { armyClass = value; }
     }
+
+    private int index = 0;
+
+    public int Index
+    {
+        get { return index; }
+        set { index = value; }
+    }
 }

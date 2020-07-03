@@ -23,14 +23,33 @@ public class ArmyManager : MonoBehaviour
     //오브젝트풀링을 위한 큐
     private Queue<GameObject> armyGroupPool;
     //시작은 2마리
-    private int maxCommander = 2;
+    private int maxCommander;
+
+
+    private int[] index;
+
+    private int count;
+
+    public int[] Index
+    {
+        get { return index; }
+        set
+        {
+            index = value;
+            //따로 Commander을 소환하는데 for문이 돌아가지 않음
+            //따라서 count로 넣어주는데
+            //어차피 index를 받는다는 점에서 count를 0으로 해줘야 하기 때문에
+            //같이 넣어준다.
+            count = 0;
+        }
+    }
 
     void Awake()
     {
         if (instance != null) Destroy(this.gameObject);
 
         instance = this;
-        DontDestroyOnLoad(this.gameObject);
+        //DontDestroyOnLoad(this.gameObject);
     }
 
     // Start is called before the first frame update
@@ -39,7 +58,15 @@ public class ArmyManager : MonoBehaviour
         armyGroupPool = new Queue<GameObject>();
 
         armyGroupPooling();
-        
+
+        index = PlayerInfoManager.instance.ArmyManagerThrowIndex;
+        maxCommander = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            if (index[i] == -1) continue;
+
+            maxCommander++;
+        }
     }
 
     //지휘관 오브젝트풀링
@@ -86,6 +113,12 @@ public class ArmyManager : MonoBehaviour
         if(armyGroupPool.Count != 0)
         {
             GameObject armyGroup = armyGroupPool.Dequeue();
+
+            //SelectClass에다가 몇번째 인덱스인지 넣어준다.
+            armyGroup.transform.GetChild(0).GetComponent<SelectClass>().Index = index[count];
+            //그리고 카운트 증가
+            count++;
+
             //활성화 해준다.
             armyGroup.SetActive(true);
             
@@ -98,6 +131,11 @@ public class ArmyManager : MonoBehaviour
             GameObject armyGroup = Instantiate(armyGroupFactory);
 
             GameObject commander = Instantiate(commanderFactory);
+
+            //SelectClass에다가 몇번째 인덱스인지 넣어준다.
+            commander.GetComponent<SelectClass>().Index = index[count];
+            //그리고 카운트 증가
+            count++;
 
             commander.transform.parent = armyGroup.transform;
 

@@ -89,6 +89,8 @@ public class Heal : MonoBehaviour
 
     public void UnColor()
     {
-        transform.GetComponentInChildren<MeshRenderer>().material.color = c;
+        //검은 색이 아니라면
+        if (transform.GetComponentInChildren<MeshRenderer>().material.color != new Color(0, 0, 0))
+            transform.GetComponentInChildren<MeshRenderer>().material.color = c;
     }
 }

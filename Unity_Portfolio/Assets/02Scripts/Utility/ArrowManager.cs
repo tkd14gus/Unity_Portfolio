@@ -39,7 +39,7 @@ public class ArrowManager : MonoBehaviour
         {
             instance = this;
 
-            DontDestroyOnLoad(this);
+            //DontDestroyOnLoad(this);
         }
         else
         {

@@ -34,6 +34,9 @@ public class PlayerInfoManager : MonoBehaviour
     }
     public void SetacfFatige(int index, int _aFatige)
     {
+        //index가 -1이면 들어가지 않았다는 말이다.
+        if (index == -1) return;
+
         armyClassFatigue a = acf[index];
         a.aFatige = _aFatige;
         acf[index] = a;
@@ -44,6 +47,21 @@ public class PlayerInfoManager : MonoBehaviour
     {
         get { return coin; }
         set { coin = value; }
+    }
+    //받았다가 바로 armyManager한테 넘겨줄 것
+    private int[] armyManagerThrowIndex;
+    public int[] ArmyManagerThrowIndex
+    {
+        get { return armyManagerThrowIndex; }
+        set { armyManagerThrowIndex = value; }
+    }
+
+    //현재 몇 스테이인지(피로도 대신 사용함)
+    private int stage = 0;
+    public int Stage
+    {
+        get { return stage; }
+        set { stage = value; }
     }
 
     //싱글톤 작업 완료
@@ -59,6 +77,7 @@ public class PlayerInfoManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //처음 시작할 때 지휘관은 둘이다.
         acf = new List<armyClassFatigue>();
         for (int i = 0; i < 2; i++)
         {
@@ -71,5 +90,23 @@ public class PlayerInfoManager : MonoBehaviour
 
             acf.Add(a);
         }
+    }
+
+    public void RemoveCommander(int _index)
+    {
+        acf.Remove(acf[_index]);
+    }
+
+    public void AddCommander(int _aClass, int _aFatige)
+    {
+
+        armyClassFatigue a;
+
+        //시작은 박스맨
+        a.aClass = _aClass;
+        //시작할 때 피로도가 존재
+        a.aFatige = _aFatige;
+
+        acf.Add(a);
     }
 }
