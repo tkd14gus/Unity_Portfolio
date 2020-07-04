@@ -80,7 +80,7 @@ public class ArcherFSM : ArmyFSM
         ShootPos.LookAt(targetEnemy);
         GameObject arrow = ArrowManager.instance.ArrowPool;
         arrow.SetActive(true);
-        arrow.GetComponent<MoveArrow>().IsArmy = false;
+        arrow.GetComponent<MoveArrow>().IsArmy = true;
         //이정도 파워가 딱 적당함
         arrow.GetComponent<MoveArrow>().Speed = Vector3.Distance(targetEnemy.position, ShootPos.position) / 2.5f;
         arrow.transform.position = ShootPos.position;

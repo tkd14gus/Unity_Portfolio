@@ -29,6 +29,9 @@ public class CommanderSpawn : MonoBehaviour
         //1초 뒤에
         yield return new WaitForSeconds(1.0f);
 
+        //몇개의 집단을 스폰해야 하는지 확인
+        army = ArmyManager.instance.MaxCommander;
+
         //0번째 인덱스에 본인의 transform이 들어감
         //때문에 0을 제외하고 실행
         for (int i = 1; i < army + 1; i++)

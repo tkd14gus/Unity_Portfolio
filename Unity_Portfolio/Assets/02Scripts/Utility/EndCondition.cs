@@ -59,10 +59,7 @@ public class EndCondition : MonoBehaviour
                 if (em[i].HP > 0) break;
 
                 if (i == em.Count - 1)
-                {
-                    Debug.Log("1?");
                     WinEnd();
-                }
             }
 
             for (int i = 0; i < am.Count; i++)
@@ -71,10 +68,7 @@ public class EndCondition : MonoBehaviour
                 if (!am[i].IsEscape && am[i].HP > 0) break;
 
                 if (i == am.Count - 1)
-                {
-                    Debug.Log("2?");
                     DefeatEnd();
-                }
             }
 
             for (int i = 0; i < bh.Count; i++)
@@ -83,10 +77,7 @@ public class EndCondition : MonoBehaviour
                 if (!bh[i].IsBreak) break;
 
                 if (i == bh.Count - 1)
-                {
-                    Debug.Log("3?");
                     DefeatEnd();
-                }
             }
         }
     }
@@ -95,11 +86,12 @@ public class EndCondition : MonoBehaviour
     {
         int[] index = ArmyManager.instance.Index;
         bool[] isDie = { false, false, false, false };
+        int count = 0;
         for (int i = 0; i < 4; i++)
         {
             if (index[i] == -1) continue;
             //죽었으면
-            if(am[i].HP <= 0)
+            if(am[count].HP <= 0)
             {
                 for (int j = 0; j < 4; j++)
                 {
@@ -109,6 +101,7 @@ public class EndCondition : MonoBehaviour
                     break;
 
                 }
+                count++;
             }
         }
 
@@ -136,11 +129,12 @@ public class EndCondition : MonoBehaviour
         }
         int[] index = ArmyManager.instance.Index;
         bool[] isDie = { false, false, false, false };
+        int count = 0;
         for (int i = 0; i < 4; i++)
         {
             if (index[i] == -1) continue;
             //죽었으면
-            if (am[i].HP <= 0)
+            if (am[count].HP <= 0)
             {
                 for (int j = 0; j < 4; j++)
                 {
@@ -150,6 +144,7 @@ public class EndCondition : MonoBehaviour
                     break;
 
                 }
+                count++;
             }
         }
 

@@ -13,7 +13,13 @@ public class ShipMove : MonoBehaviour
     private Transform armyGroup = null;
     private Transform[] armyArray;
 
-    private Color c; 
+    private Color c;
+
+    [SerializeField] private float delayTime;
+    public float DelayTime
+    {
+        get { return delayTime; }
+    }
 
     private bool isAnchorage = false;
     public bool IsAnchorage
@@ -49,7 +55,8 @@ public class ShipMove : MonoBehaviour
 
     IEnumerator Move()
     {
-        while(true)
+        yield return new WaitForSeconds(delayTime);
+        while (true)
         {
             yield return new WaitForSeconds(0.01f);
             //도착하지 않았다면 계속 앞으로

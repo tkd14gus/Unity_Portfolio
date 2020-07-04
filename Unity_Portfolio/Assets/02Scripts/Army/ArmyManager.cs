@@ -24,7 +24,10 @@ public class ArmyManager : MonoBehaviour
     private Queue<GameObject> armyGroupPool;
     //시작은 2마리
     private int maxCommander;
-
+    public int MaxCommander
+    {
+        get { return maxCommander; }
+    }
 
     private int[] index;
 
@@ -55,10 +58,6 @@ public class ArmyManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        armyGroupPool = new Queue<GameObject>();
-
-        armyGroupPooling();
-
         index = PlayerInfoManager.instance.ArmyManagerThrowIndex;
         maxCommander = 0;
         for (int i = 0; i < 4; i++)
@@ -67,17 +66,36 @@ public class ArmyManager : MonoBehaviour
 
             maxCommander++;
         }
+
+        //병사 그룹 오브젝트풀링
+        armyGroupPool = new Queue<GameObject>();
+        armyGroupPooling();
     }
 
-    //지휘관 오브젝트풀링
+    //병사 그룹 오브젝트풀링
     private void armyGroupPooling()
     {
+        //쉽게 확인하기 위해서 사용한 것은 -1로 바꿔줘야 하는데
+        //원본을 제거하면 복잡해짐
+        int[] tempIndex = index;
         //오브젝트 풀을 위해 지휘관들을 넣어준다.
         for (int i = 0; i < maxCommander; i++)
         {
             GameObject armyGroup = Instantiate(armyGroupFactory);
 
             GameObject commander = Instantiate(commanderFactory);
+
+            for (int j = 0; j < 4; j++)
+            {
+                if (tempIndex[j] != -1)
+                {
+                    commander.GetComponent<SelectClass>().ArmyClass = PlayerInfoManager.instance.GetacfClass(tempIndex[j]);
+                    Debug.Log("class : " + PlayerInfoManager.instance.GetacfClass(tempIndex[j]));
+                    tempIndex[j] = -1;
+                    break;
+                }
+            }
+
 
             commander.transform.parent = armyGroup.transform;
 
@@ -170,7 +188,6 @@ public class ArmyManager : MonoBehaviour
         GameObject army = null;
         switch (num)
         {
-            //일단 하나밖에 없어서 하나만 케이스에 넣는다.
             case 0:
                 army = Instantiate(armyFactory);
 

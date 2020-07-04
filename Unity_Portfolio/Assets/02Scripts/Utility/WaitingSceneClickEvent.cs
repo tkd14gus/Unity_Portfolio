@@ -8,15 +8,20 @@ public class WaitingSceneClickEvent : MonoBehaviour
 {
 
     private int stage;
+    private Text coin;
 
     void Start()
     {
         stage = PlayerInfoManager.instance.Stage;
 
+        coin = transform.Find("CoinNum").GetComponent<Text>();
+
         for (int i = 0; i < stage; i++)
         {
             transform.GetChild(i).GetComponent<Button>().interactable = false;
         }
+
+        ChangeCoin();
     }
 
     public void OnClickLevel02()
@@ -25,12 +30,13 @@ public class WaitingSceneClickEvent : MonoBehaviour
         {
             //첫번째 맵을 올려준다.
             SceneManager.LoadScene("Level02");
-            SceneManager.LoadScene("CanvasScene", LoadSceneMode.Additive);
+            SceneManager.LoadScene("WaitingCanvas Scene", LoadSceneMode.Additive);
         }
         else
         {
             //오류메시지
             transform.Find("ErrorMassage").gameObject.SetActive(true);
+            StartCoroutine(MassageFalse());
         }
     }
 
@@ -40,11 +46,12 @@ public class WaitingSceneClickEvent : MonoBehaviour
         {
             //첫번째 맵을 올려준다.
             SceneManager.LoadScene("Level03");
-            SceneManager.LoadScene("CanvasScene", LoadSceneMode.Additive);
+            SceneManager.LoadScene("WaitingCanvas Scene", LoadSceneMode.Additive);
         }
         else
         {
             transform.Find("ErrorMassage").gameObject.SetActive(true);
+            StartCoroutine(MassageFalse());
         }
     }
 
@@ -54,12 +61,18 @@ public class WaitingSceneClickEvent : MonoBehaviour
         {
             //첫번째 맵을 올려준다.
             SceneManager.LoadScene("Level04");
-            SceneManager.LoadScene("CanvasScene", LoadSceneMode.Additive);
+            SceneManager.LoadScene("WaitingCanvas Scene", LoadSceneMode.Additive);
         }
         else
         {
             transform.Find("ErrorMassage").gameObject.SetActive(true);
+            StartCoroutine(MassageFalse());
         }
+    }
+
+    public void OnClicUpgrad()
+    {
+        SceneManager.LoadScene("UpgradScene");
     }
 
     IEnumerator MassageFalse()
@@ -67,5 +80,10 @@ public class WaitingSceneClickEvent : MonoBehaviour
         yield return new WaitForSeconds(2.5f);
 
         transform.Find("ErrorMassage").gameObject.SetActive(false);
+    }
+
+    public void ChangeCoin()
+    {
+        coin.text = PlayerInfoManager.instance.Coin.ToString();
     }
 }

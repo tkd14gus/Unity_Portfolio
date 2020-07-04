@@ -219,7 +219,6 @@ public class ArmyFSM : MonoBehaviour
 
     private void Move()
     {
-        Debug.Log(anim);
         anim.SetTrigger("Move");
         //위치까지 이동하고
         //cc.Move(dir * speed * Time.deltaTime);

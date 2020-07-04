@@ -20,6 +20,10 @@ public class PlayerInfoManager : MonoBehaviour
     private List<armyClassFatigue> acf;
     public int GetacfClass(int index)
     {
+        //크면 없다고 리턴시켜준다.
+        if (index > acf.Count - 1)
+            return -1;
+
         return acf[index].aClass;
     }
     public int GetacfFatige(int index)
@@ -40,6 +44,10 @@ public class PlayerInfoManager : MonoBehaviour
         armyClassFatigue a = acf[index];
         a.aFatige = _aFatige;
         acf[index] = a;
+    }
+    public int GetacfCount()
+    {
+        return acf.Count;
     }
 
     private int coin;
@@ -89,6 +97,23 @@ public class PlayerInfoManager : MonoBehaviour
             a.aFatige = 1;
 
             acf.Add(a);
+        }
+    }
+
+    private void Update()
+    {
+        //치트키
+        if(Input.GetKeyDown(KeyCode.W))
+        {
+            coin += 1;
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            Time.timeScale += 2;
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            Time.timeScale -= 2;
         }
     }
 
