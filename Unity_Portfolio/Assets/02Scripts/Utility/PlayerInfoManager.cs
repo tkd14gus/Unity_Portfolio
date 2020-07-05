@@ -76,7 +76,9 @@ public class PlayerInfoManager : MonoBehaviour
     //싱글톤 작업 완료
     void Awake()
     {
-        if(instance != null)
+        Screen.SetResolution(1920, 1080, true);
+
+        if (instance != null)
         {
             Destroy(gameObject);
         }
