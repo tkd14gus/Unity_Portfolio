@@ -63,11 +63,16 @@ public class ArcherFSM : ArmyFSM
             if (Vector3.Distance(targetEnemy.position, transform.position) <= attackDis)
             {
                 anim.SetTrigger("Attack");
+
+                //사운드
+                audio.clip = FindSoundClip("Attack");
+                    audio.Play();
+
                 //공격력 나중에 처리
                 //아처는 화살을 쏘아냄
                 //targetEnemy.GetComponent<EnemyFSM>().HP -= 20;
 
-                ShootArrow();
+                StartCoroutine(ShootArrow());
                 curTime = 0.0f;
                 return;
             }
@@ -75,7 +80,7 @@ public class ArcherFSM : ArmyFSM
         }
     }
 
-    private void ShootArrow()
+    private void Shoot()
     {
         ShootPos.LookAt(targetEnemy);
         GameObject arrow = ArrowManager.instance.ArrowPool;
@@ -94,5 +99,16 @@ public class ArcherFSM : ArmyFSM
         //ro.y += Random.Range(5.0f, 10.0f);
         //ro.z += Random.Range(-1.0f, 1.0f);
         arrow.transform.Rotate(ro);
+
+        //사운드
+        audio.clip = FindSoundClip("ArrowShoot");
+        audio.Play();
+    }
+
+    IEnumerator ShootArrow()
+    {
+        yield return new WaitForSeconds(0.4f);
+
+        Shoot();
     }
 }

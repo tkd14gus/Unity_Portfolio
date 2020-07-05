@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -85,8 +86,16 @@ public class PlayerInfoManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //처음 시작할 때 지휘관은 둘이다.
         acf = new List<armyClassFatigue>();
+
+        ResetACF();
+    }
+
+    public void ResetACF()
+    {
+        //처음 시작할 때 지휘관은 둘이다.
+        acf.Clear();
+
         for (int i = 0; i < 2; i++)
         {
             armyClassFatigue a;

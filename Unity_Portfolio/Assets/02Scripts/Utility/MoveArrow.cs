@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class MoveArrow : MonoBehaviour
 {
+
+    private AudioSource audio;
+
     private float Angle = 45.0f; // ?? 앵글이 45도인데 왜 45도로 셋팅해서 하는지는 모르겠다.
     private float gravity = 0.1f;
     private float speed = 2.0f;
@@ -30,6 +33,7 @@ public class MoveArrow : MonoBehaviour
     void Start()
     {
         gravity = -(1.0f * Time.deltaTime * Time.deltaTime / 2.0f);//고정 중력값
+        audio = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -77,10 +81,11 @@ public class MoveArrow : MonoBehaviour
                             nearObject[i].GetComponent<EnemyFSM>().HP -= 20;
                         }
 
+                        audio.Play();
                         StopAllCoroutines();
                         ArrowManager.instance.ArrowPool = gameObject;
+                        return;
                     }
-                    return;
                 }
             }
             //적이 쏜 화살일 때
@@ -97,10 +102,12 @@ public class MoveArrow : MonoBehaviour
                         else
                             nearObject[i].transform.parent.GetComponent<HPManager>().HP -= 20;
 
+                        audio.Play();
                         StopAllCoroutines();
                         ArrowManager.instance.ArrowPool = gameObject;
+
+                        return;
                     }
-                    return;
                 }
             }
             //무엇과 부딪혔든 코루틴은 멈추고 오브젝트풀로 돌아감

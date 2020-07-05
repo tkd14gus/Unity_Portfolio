@@ -105,6 +105,8 @@ public class EndCondition : MonoBehaviour
             }
         }
 
+        //일시정지 시켜준다.
+        Time.timeScale = 0;
         StopAllCoroutines();
         Debug.Log("짐");
         GameObject.Find("EndUI").GetComponent<EndUIEvent>().Calculation(false, 0, index, isDie);
@@ -114,43 +116,57 @@ public class EndCondition : MonoBehaviour
     //승리
     private void WinEnd()
     {
-        int coin = 0;
-        for (int i = 0; i < bh.Count; i++)
+        if (PlayerInfoManager.instance.Stage == 3)
         {
-            //집이 안 부서졌다면
-            if (!bh[i].IsBreak)
-            {
-                //이름에 big이 들어갔다면
-                if (bh[i].gameObject.name.Contains("Big"))
-                    coin += 2;
-                else
-                    coin += 3;
-            }
+            //일시정지 시켜준다.
+            Time.timeScale = 0;
+            StopAllCoroutines();
+            Debug.Log("승리");
+            GameObject.Find("EndUI").GetComponent<EndUIEvent>().GameClearImage();
+            GameObject.Find("SoundManager").GetComponent<BattleSound>().MainPlay("ClearSound");
         }
-        int[] index = ArmyManager.instance.Index;
-        bool[] isDie = { false, false, false, false };
-        int count = 0;
-        for (int i = 0; i < 4; i++)
+        else
         {
-            if (index[i] == -1) continue;
-            //죽었으면
-            if (am[count].HP <= 0)
+            int coin = 0;
+            for (int i = 0; i < bh.Count; i++)
             {
-                for (int j = 0; j < 4; j++)
+                //집이 안 부서졌다면
+                if (!bh[i].IsBreak)
                 {
-                    if (index[j] != am[i].gameObject.GetComponent<SelectClass>().Index) continue;
-                    //죽었다고 표시
-                    isDie[j] = false;
-                    break;
-
+                    //이름에 big이 들어갔다면
+                    if (bh[i].gameObject.name.Contains("Big"))
+                        coin += 2;
+                    else
+                        coin += 3;
                 }
-                count++;
             }
-        }
+            int[] index = ArmyManager.instance.Index;
+            bool[] isDie = { false, false, false, false };
+            int count = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                if (index[i] == -1) continue;
+                //죽었으면
+                if (am[count].HP <= 0)
+                {
+                    for (int j = 0; j < 4; j++)
+                    {
+                        if (index[j] != am[i].gameObject.GetComponent<SelectClass>().Index) continue;
+                        //죽었다고 표시
+                        isDie[j] = false;
+                        break;
 
-        StopAllCoroutines();
-        Debug.Log("이김");
-        GameObject.Find("EndUI").GetComponent<EndUIEvent>().Calculation(true, coin, index, isDie);
-        //캔버스에 있는 EndUI에다가 판 종료 이미지 출력 요청
+                    }
+                    count++;
+                }
+            }
+            GameObject.Find("SoundManager").GetComponent<BattleSound>().MainPlay("WinSound");
+            //일시정지 시켜준다.
+            Time.timeScale = 0;
+            StopAllCoroutines();
+            Debug.Log("이김");
+            GameObject.Find("EndUI").GetComponent<EndUIEvent>().Calculation(true, coin, index, isDie);
+            //캔버스에 있는 EndUI에다가 판 종료 이미지 출력 요청
+        }
     }
 }

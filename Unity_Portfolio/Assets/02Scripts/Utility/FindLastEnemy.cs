@@ -34,6 +34,8 @@ public class FindLastEnemy : MonoBehaviour
         //Text오브젝트는 켜주고, 본인은 뚜렷명하게
         massage.transform.GetChild(0).gameObject.SetActive(true);
         massage.transform.GetComponent<Image>().color = new Color(0, 0, 0, 255);
+        //소리도로 가르쳐준다.
+        GameObject.Find("SoundManager").GetComponent<BattleSound>().WavePlay("Lur 02");
 
         yield return new WaitForSeconds(1.5f);
         //다시 꺼준다.

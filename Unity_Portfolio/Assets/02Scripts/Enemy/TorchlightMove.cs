@@ -10,6 +10,8 @@ public class TorchlightMove : MonoBehaviour
     //앞으로 나가는 속도
     public float speed = 2.0f;
 
+    private AudioSource audio;
+
     //건물과 거리계산할 때 쓸것
     private Transform target;
 
@@ -19,10 +21,10 @@ public class TorchlightMove : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    //void Start()
-    //{
-    //
-    //}
+    void Start()
+    {
+        audio = GetComponent<AudioSource>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -35,9 +37,12 @@ public class TorchlightMove : MonoBehaviour
         //중력 작용
         downPower -= 0.5f;
         Vector3 g = new Vector3(0, 1 + downPower, 0);
-
+        
         transform.position += transform.forward * speed * Time.deltaTime;
         transform.position += g * Time.deltaTime;
+
+        if (!audio.isPlaying)
+            audio.Play();
 
         StartCoroutine(Fa());
 

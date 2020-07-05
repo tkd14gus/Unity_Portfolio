@@ -90,7 +90,6 @@ public class ArmyManager : MonoBehaviour
                 if (tempIndex[j] != -1)
                 {
                     commander.GetComponent<SelectClass>().ArmyClass = PlayerInfoManager.instance.GetacfClass(tempIndex[j]);
-                    Debug.Log("class : " + PlayerInfoManager.instance.GetacfClass(tempIndex[j]));
                     tempIndex[j] = -1;
                     break;
                 }

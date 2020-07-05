@@ -11,6 +11,10 @@ public class ArmySpawn : MonoBehaviour
     //병사 오브젝트
     private GameObject[] army;
 
+    //사운드
+    private AudioSource audio;
+
+    
     public void ArmyComponerts()
     {
         //c++에선 안됐었는데...
@@ -29,12 +33,18 @@ public class ArmySpawn : MonoBehaviour
     //병사들을 깨우는 함수
     public void AwakeArmy(Vector3 point)
     {
+        //사운드 컴포넌트
+        audio = GetComponent<AudioSource>();
+
         //병사들의 직업 선택
         SelectArmyClass();
 
         //먼저 지휘관 부터 생성
         army[0].SetActive(true);
-        
+
+        //등장 사운드 한번
+        audio.Play();
+
         //위치 설정
         army[0].transform.position = point;
         
@@ -48,6 +58,7 @@ public class ArmySpawn : MonoBehaviour
 
         StartCoroutine(AwakeArmyCoroutine());
 
+
     }
 
     IEnumerator AwakeArmyCoroutine()
@@ -58,7 +69,8 @@ public class ArmySpawn : MonoBehaviour
         {
             //깨워주고
             army[i].SetActive(true);
-            
+            //등장 사운드 한번
+            audio.Play();
             //상태를 IDLE로 바꿔준다.
             IDLE(i);
 

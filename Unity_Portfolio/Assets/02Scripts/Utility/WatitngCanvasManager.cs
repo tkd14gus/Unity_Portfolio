@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class WatitngCanvasManager : MonoBehaviour
 {
+    private AudioSource audio;
     private Canvas ca;
     //출전할 지휘관의 인덱스
     private int[] index;
@@ -83,6 +84,9 @@ public class WatitngCanvasManager : MonoBehaviour
 
     public void OnClickSlot01()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
         //일단 전부 닫아준다.
         CloseSlot();
 
@@ -134,6 +138,9 @@ public class WatitngCanvasManager : MonoBehaviour
 
     public void OnClickSlot02()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
         //일단 전부 닫아준다.
         CloseSlot();
 
@@ -182,6 +189,9 @@ public class WatitngCanvasManager : MonoBehaviour
 
     public void OnClickSlot03()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
         //일단 전부 닫아준다.
         CloseSlot();
 
@@ -230,6 +240,8 @@ public class WatitngCanvasManager : MonoBehaviour
 
     public void OnClickSlot04()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
 
         //일단 전부 닫아준다.
         CloseSlot();
@@ -279,6 +291,9 @@ public class WatitngCanvasManager : MonoBehaviour
 
     public void OnClickSubSlot()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
         int clickNum = 0;
         tempBtn = EventSystem.current.currentSelectedGameObject;
         int i = 0;
@@ -352,6 +367,12 @@ public class WatitngCanvasManager : MonoBehaviour
 
     public void OnClickStart()
     {
+        //들어가는 2.5초동안 아무도 선택 못하도록 잠궈준다.
+        for (int i = 0; i < 4; i++)
+        {
+            ca.transform.GetChild(i).GetComponent<Button>().interactable = false;
+        }
+
         //스테이지가 3이면 PlayerInfoManager에도 지휘관 추가
         if (stage == 2)
         {
@@ -359,7 +380,6 @@ public class WatitngCanvasManager : MonoBehaviour
             index[3] = PlayerInfoManager.instance.GetacfCount();
             //0번 병종(Baxman)에 피로도(지금 안쓰임) 0이라는 말이다.
             PlayerInfoManager.instance.AddCommander(0, 0);
-            ca.transform.GetChild(3).GetComponent<Button>().interactable = true;
         }
 
         for (int i = 0; i < 4; i++)
@@ -371,13 +391,32 @@ public class WatitngCanvasManager : MonoBehaviour
                 return;
         }
 
+        audio = GetComponent<AudioSource>();
+
+        audio.clip = (AudioClip)Resources.Load("Sound/StartSound");
+        audio.PlayOneShot(audio.clip);
+
+        StartCoroutine(StageStart());
+
+    }
+
+    IEnumerator StageStart()
+    {
+        //사운드 시간
+        yield return new WaitForSeconds(2.5f);
+
+        //다시 풀어준다.
+        for (int i = 0; i < 4; i++)
+        {
+            ca.transform.GetChild(i).GetComponent<Button>().interactable = true;
+        }
+
         //여기다 보내면 판이 시작할 때 ArmyManager로 보내준다.
         PlayerInfoManager.instance.ArmyManagerThrowIndex = index;
 
-
+        BGMMgr.Instance.PauseBGM();
         //현재 씬 재시작
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         SceneManager.LoadScene("CanvasScene", LoadSceneMode.Additive);
-
     }
 }

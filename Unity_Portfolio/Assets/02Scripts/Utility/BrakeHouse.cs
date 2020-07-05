@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class BrakeHouse : MonoBehaviour
 {
-
+    private AudioSource audio;
+    public GameObject ExprosionFactory;
     private bool isBreak = false;
     public bool IsBreak
     {
@@ -21,6 +22,7 @@ public class BrakeHouse : MonoBehaviour
     void Start()
     {
         enemy = GameObject.FindGameObjectsWithTag("Enemy");
+        audio = GetComponent<AudioSource>();
     }
     public void Damaged()
     {
@@ -43,6 +45,17 @@ public class BrakeHouse : MonoBehaviour
             isBreak = true;
             //색상 변경
             transform.GetChild(0).GetComponent<MeshRenderer>().material.color = new Color(0, 0, 0);
+
+            audio.Play();
+            GameObject ex = Instantiate(ExprosionFactory);
+            ex.transform.position = transform.position;
         }
+    }
+
+    IEnumerator DeletEx(GameObject ex)
+    {
+        yield return new WaitForSeconds(2.5f);
+
+        Destroy(ex);
     }
 }

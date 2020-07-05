@@ -54,10 +54,14 @@ public class ArcherEnemyFSM : EnemyFSM
             {
                 Debug.Log("rhdrur!");
                 anim.SetTrigger("Attack");
+
+                //사운드
+                audio.clip = FindSoundClip("Attack");
+                audio.Play();
+
                 //공격력 나중에 처리
                 //아처는 화살을 쏘아냄
-                ShootArrow();
-
+                StartCoroutine(ShootArrow());
                 curTime = 0.0f;
                 return;
             }
@@ -71,7 +75,7 @@ public class ArcherEnemyFSM : EnemyFSM
         }
     }
 
-    private void ShootArrow()
+    private void Shoot()
     {
         //높이 던질 힘 계산
         //음수가 나오면 타겟의 위치가 더 높음
@@ -95,5 +99,16 @@ public class ArcherEnemyFSM : EnemyFSM
         //ro.y += Random.Range(5.0f, 10.0f);
         //ro.z += Random.Range(-1.0f, 1.0f);
         arrow.transform.Rotate(ro);
+
+        //사운드
+        audio.clip = FindSoundClip("ArrowShoot");
+        audio.Play();
+    }
+
+    IEnumerator ShootArrow()
+    {
+        yield return new WaitForSeconds(0.4f);
+
+        Shoot();
     }
 }

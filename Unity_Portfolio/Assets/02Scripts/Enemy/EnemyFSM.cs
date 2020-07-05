@@ -12,6 +12,7 @@ public class EnemyFSM : MonoBehaviour
     protected NavMeshAgent agent;
     private CharacterController cc;
     protected Animator anim;
+    protected AudioSource audio;
 
     private int nearTargetIndex = 0;
     private int nearArmyIndex = 0;
@@ -61,6 +62,11 @@ public class EnemyFSM : MonoBehaviour
                     Die();
                     print("All -> 다이");
                     anim.SetTrigger("Die");
+
+                    //사운드
+                    audio.clip = FindSoundClip("Die");
+                    if (!audio.isPlaying)
+                        audio.Play();
                 }
                 else
                 {
@@ -68,6 +74,11 @@ public class EnemyFSM : MonoBehaviour
                     Damaged();
                     print("All -> 데미지드");
                     anim.SetTrigger("Damaged");
+
+                    //사운드
+                    audio.clip = FindSoundClip("Damaged");
+                    if (!audio.isPlaying)
+                        audio.Play();
                 }
             }
         }
@@ -92,16 +103,21 @@ public class EnemyFSM : MonoBehaviour
         //캐릭터컨트롤러 컴포넌트
         cc = GetComponent<CharacterController>();
         anim = GetComponentInChildren<Animator>();
+        audio = GetComponent<AudioSource>();
 
         //횃불
         torchlight = Instantiate(torchlightFactory);
         torchlight.SetActive(false);
+
 
     }
 
     // Update is called once per frame
     protected virtual void Update()
     {
+        //타임 스케일에 맞춰 속도 조절
+        audio.pitch = Time.timeScale;
+
         if (hp <= 0)
             es = EnemyState.Die;
         switch (es)
@@ -192,6 +208,12 @@ public class EnemyFSM : MonoBehaviour
     private void Move()
     {
         anim.SetTrigger("Move");
+
+        //사운드
+        audio.clip = FindSoundClip("Move");
+        if (!audio.isPlaying)
+            audio.Play();
+
         //위치까지 이동하고
         agent.SetDestination(target[nearTargetIndex].position);
 
@@ -244,6 +266,12 @@ public class EnemyFSM : MonoBehaviour
             StartCoroutine(ChangeAttack());
             es = EnemyState.Move;
             anim.SetTrigger("Move");
+
+            //사운드
+            audio.clip = FindSoundClip("Move");
+            if (!audio.isPlaying)
+                audio.Play();
+
             return;
         }
 
@@ -256,6 +284,12 @@ public class EnemyFSM : MonoBehaviour
             if (Vector3.Distance(targetArmy.position, transform.position) <= 0.2)
             {
                 anim.SetTrigger("Attack");
+
+                //사운드
+                audio.clip = FindSoundClip("Attack");
+                if (!audio.isPlaying)
+                    audio.Play();
+
                 Debug.Log("Enemy : 공겨어어어억! ");
                 
                 //공격력 나중에 처리
@@ -285,6 +319,12 @@ public class EnemyFSM : MonoBehaviour
             //이동
             agent.SetDestination(vt);
             anim.SetTrigger("Move");
+
+            //사운드
+            audio.clip = FindSoundClip("Move");
+            if (!audio.isPlaying)
+                audio.Play();
+
             //0.4초 후
             yield return new WaitForSeconds(0.3f);
             //0.4초동안 움직임을 막아준다.
@@ -327,7 +367,6 @@ public class EnemyFSM : MonoBehaviour
         if (hp > 0)
         {
             StartCoroutine(DamagedMotion());
-            anim.SetTrigger("Damaged");
         }
         else
             es = EnemyState.Die;
@@ -355,6 +394,11 @@ public class EnemyFSM : MonoBehaviour
                 StartCoroutine(ChangeAttack());
                 print("데미지드 -> 무브");
                 anim.SetTrigger("Move");
+
+                //사운드
+                audio.clip = FindSoundClip("Move");
+                if (!audio.isPlaying)
+                    audio.Play();
             }
         }
     }
@@ -457,6 +501,12 @@ public class EnemyFSM : MonoBehaviour
             //상태를 Move로 바꿔준다. 
             es = EnemyState.Move;
             anim.SetTrigger("Move");
+
+            //사운드
+            audio.clip = FindSoundClip("Move");
+            if (!audio.isPlaying)
+                audio.Play();
+
             return true;
         }
         
@@ -497,6 +547,12 @@ public class EnemyFSM : MonoBehaviour
         //다시 이동
         es = EnemyState.Move;
         anim.SetTrigger("Move");
+
+        //사운드
+        audio.clip = FindSoundClip("Move");
+        if (!audio.isPlaying)
+            audio.Play();
+
         Debug.Log("시즈 -> 무브");
         //적을 발견하면 싸우도록
         StartCoroutine(ChangeAttack());
@@ -529,6 +585,12 @@ public class EnemyFSM : MonoBehaviour
     {
         es = EnemyState.Move;
         anim.SetTrigger("Move");
+
+        //사운드
+        audio.clip = FindSoundClip("Move");
+        if (!audio.isPlaying)
+            audio.Play();
+
         Debug.Log("어택 -> 무브");
         StartCoroutine(ChangeAttack());
     }
@@ -553,6 +615,12 @@ public class EnemyFSM : MonoBehaviour
             //목적지로 조금씩 움직인다.
             agent.SetDestination(target[nearTargetIndex].position);
             anim.SetTrigger("Move");
+
+            //사운드
+            audio.clip = FindSoundClip("Move");
+            if (!audio.isPlaying)
+                audio.Play();
+
             //0.2초동안
             yield return new WaitForSeconds(0.3f);
             //그 후엔 자기자리
@@ -563,12 +631,32 @@ public class EnemyFSM : MonoBehaviour
         }
     }
 
-    //IEnumerator animMove()
-    //{
-    //    while (true)
-    //    {
-    //        anim.SetTrigger("Move");
-    //        yield return new WaitForSeconds(0.3f);
-    //    }
-    //}
+    //일단 같은 사운드
+    protected AudioClip FindSoundClip(String animState)
+    {
+        AudioClip Sound = null;
+        switch (animState)
+        {
+            case "Move":
+                Sound = (AudioClip)Resources.Load("Sound/" + "Move");
+                break;
+            case "Attack":
+                if (transform.name.Contains("Archer"))
+                    Sound = (AudioClip)Resources.Load("Sound/" + "ArcherAttack");
+                else
+                    Sound = (AudioClip)Resources.Load("Sound/" + "Attack");
+                break;
+            case "Damaged":
+                Sound = (AudioClip)Resources.Load("Sound/" + "Damaged");
+                break;
+            case "Die":
+                Sound = (AudioClip)Resources.Load("Sound/" + "Die");
+                break;
+            case "Shoot":
+                Sound = (AudioClip)Resources.Load("Sound/" + "ArrowShoot");
+                break;
+        }
+
+        return Sound;
+    }
 }

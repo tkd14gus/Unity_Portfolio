@@ -6,16 +6,30 @@ using UnityEngine.UI;
 
 public class EndUIEvent : MonoBehaviour
 {
+    private AudioSource audio;
 
     //나가기를 눌렀을 떄
     public void OnClickEscape()
     {
-        //시간을 원래대로 맞춰준다.
-        Time.timeScale = 1;
-        //스테이지를 1 올려준다.
-        PlayerInfoManager.instance.Stage += 1;
-        //나간다.
-        SceneManager.LoadScene("WaitingScene");
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
+        if (PlayerInfoManager.instance.Stage == 3)
+        {
+            //시간을 원래대로 맞춰준다.
+            Time.timeScale = 1;
+            //초기 화면으로 나간다.
+            SceneManager.LoadScene("StartScene");
+        }
+        else
+        {
+            //시간을 원래대로 맞춰준다.
+            Time.timeScale = 1;
+            //스테이지를 1 올려준다.
+            PlayerInfoManager.instance.Stage += 1;
+            //나간다.
+            SceneManager.LoadScene("WaitingScene");
+        }
     }
 
     public void Calculation(bool result, int _coin, int[] _aIndex, bool[] _isDie)
@@ -52,6 +66,14 @@ public class EndUIEvent : MonoBehaviour
         //text와 이미지 뭉치를 켜준다.
         transform.GetChild(2).gameObject.SetActive(true);
 
+        //나가기 버튼
+        transform.GetChild(3).gameObject.SetActive(true);
+    }
+
+    public void GameClearImage()
+    {
+        //게임이 끝났으니 클리어 이미지를 띄어준다.
+        transform.GetChild(4).gameObject.SetActive(true);
         //나가기 버튼
         transform.GetChild(3).gameObject.SetActive(true);
     }

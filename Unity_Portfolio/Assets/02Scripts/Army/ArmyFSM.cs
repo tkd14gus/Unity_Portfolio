@@ -13,6 +13,7 @@ public class ArmyFSM : MonoBehaviour
     protected NavMeshAgent agent;
     protected Transform targetEnemy;
     protected Animator anim;
+    protected AudioSource audio;
 
     //움직일 곳
     private Vector3 mPoint;
@@ -131,6 +132,11 @@ public class ArmyFSM : MonoBehaviour
         cc = GetComponent<CharacterController>();
         agent = GetComponent<NavMeshAgent>();
         //anim = transform.GetChild(0).GetComponent<Animator>();
+        //본인이 누군지 모르기 때문에 부모인 그룹으로 들어가 무조건 지휘관이 있는 첫번째 오브젝트로 들어간다.
+        //지휘관은 자신의 클레스가 무엇인지 알기 때문에 그것을 받아오고
+        //클레스와 사용하고 있는 자식 오브젝트가 같기 때문에 그것으로 오디오를 받아와준다.
+        audio = GetComponent<AudioSource>();
+        audio.volume = 0.5f;
 
         StartCoroutine(ChangeAttack());
         
@@ -139,6 +145,9 @@ public class ArmyFSM : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        //타임 스케일에 맞춰 속도 조절
+        audio.pitch = Time.timeScale;
+
         if (hp <= 0)
             ArSt = ArmyState.Die;
         switch (ArSt)
@@ -219,7 +228,14 @@ public class ArmyFSM : MonoBehaviour
 
     private void Move()
     {
+        //애니메이션
         anim.SetTrigger("Move");
+
+        //사운드
+        audio.clip = FindSoundClip("Move");
+        if (!audio.isPlaying)
+            audio.Play();
+
         //위치까지 이동하고
         //cc.Move(dir * speed * Time.deltaTime);
         agent.SetDestination(mPoint);
@@ -251,6 +267,13 @@ public class ArmyFSM : MonoBehaviour
         //만일 배를 타고 있다면 뒤로 물러난다.
         if(targetEnemy.parent != null)
         {
+            //애니메이션
+            anim.SetTrigger("Move");
+            //사운드
+            audio.clip = FindSoundClip("Move");
+            if (!audio.isPlaying)
+                audio.Play();
+
             agent.velocity = Vector3.zero;
             transform.position += targetEnemy.parent.forward * 0.6f * Time.deltaTime;
             return;
@@ -260,12 +283,20 @@ public class ArmyFSM : MonoBehaviour
         //크다면 공격
         if (curTime >= attackTime)
         {
-           //속도 조절은 나중에 하자
-           agent.SetDestination(targetEnemy.position);
+            //애니메이션
+            anim.SetTrigger("Move");
+
+            //속도 조절은 나중에 하자
+            agent.SetDestination(targetEnemy.position);
            
            if (Vector3.Distance(targetEnemy.position, transform.position) <= 0.25)
            {
                 anim.SetTrigger("Attack");
+
+                //사운드
+                audio.clip = FindSoundClip("Attack");
+                    audio.Play();
+
                 Debug.Log("Army : 공겨어어어억!");
                 //공격력 나중에 처리
                 targetEnemy.GetComponent<EnemyHPManager>().HP -= 10;
@@ -277,6 +308,9 @@ public class ArmyFSM : MonoBehaviour
         //작다면 슬금슬금 물러선다.
         else
         {
+            //애니메이션
+            anim.SetTrigger("Move");
+
             if (curTime == 0.0f)
             {
                 //켜져있을지도 모르니까 꺼주고
@@ -305,6 +339,12 @@ public class ArmyFSM : MonoBehaviour
             //이동
             agent.SetDestination(vt);
             anim.SetTrigger("Move");
+
+            //사운드
+            audio.clip = FindSoundClip("Move");
+            if (!audio.isPlaying)
+                audio.Play();
+
             //0.4초 후
             yield return new WaitForSeconds(0.3f);
             //0.4초동안 움직임을 막아준다.
@@ -319,6 +359,12 @@ public class ArmyFSM : MonoBehaviour
     private void Damaged()
     {
         anim.SetTrigger("Damaged");
+
+        //사운드
+        audio.clip = FindSoundClip("Damaged");
+        if (!audio.isPlaying)
+            audio.Play();
+
         StartCoroutine(DamagedMotion());
     }
 
@@ -335,6 +381,12 @@ public class ArmyFSM : MonoBehaviour
     private void Die()
     {
         anim.SetTrigger("Die");
+
+        //사운드
+        audio.clip = FindSoundClip("Die");
+        if (!audio.isPlaying)
+            audio.Play();
+
         //스크립트를 종료시켜준다
         //Debug.Log(transform.parent.GetChild(0).GetComponent<SelectClass>().ArmyClass);
         //switch (transform.parent.GetChild(0).GetComponent<SelectClass>().ArmyClass)
@@ -368,6 +420,12 @@ public class ArmyFSM : MonoBehaviour
     private void Heal()
     {
         anim.SetTrigger("Move");
+
+        //사운드
+        audio.clip = FindSoundClip("Move");
+        if (!audio.isPlaying)
+            audio.Play();
+
         agent.SetDestination(hPoint.position);
 
 
@@ -382,6 +440,12 @@ public class ArmyFSM : MonoBehaviour
     private void Escape()
     {
         anim.SetTrigger("Move");
+
+        //사운드
+        audio.clip = FindSoundClip("Move");
+        if (!audio.isPlaying)
+            audio.Play();
+
         agent.SetDestination(ePoint.position);
 
         //배에 태워준다.
@@ -453,5 +517,33 @@ public class ArmyFSM : MonoBehaviour
             return true;
         else
             return false;
+    }
+
+    protected AudioClip FindSoundClip(String animState)
+    {
+        AudioClip Sound = null;
+        switch (animState)
+        {
+            case "Move":
+                Sound = (AudioClip)Resources.Load("Sound/" + "Move");
+                break;
+            case "Attack":
+                if(transform.parent.GetChild(0).GetComponent<SelectClass>().ArmyClass == 1)
+                    Sound = (AudioClip)Resources.Load("Sound/" + "ArcherAttack");
+                else
+                    Sound = (AudioClip)Resources.Load("Sound/" + "Attack");
+                break;
+            case "Damaged":
+                Sound = (AudioClip)Resources.Load("Sound/" + "Damaged");
+                break;
+            case "Die":
+                Sound = (AudioClip)Resources.Load("Sound/" + "Die");
+                break;
+            case "Shoot":
+                Sound = (AudioClip)Resources.Load("Sound/" + "ArrowShoot");
+                break;
+        }
+
+        return Sound;
     }
 }

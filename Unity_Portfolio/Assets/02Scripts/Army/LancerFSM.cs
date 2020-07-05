@@ -104,6 +104,12 @@ public class LancerFSM : ArmyFSM
         if (targetEnemy.parent != null)
         {
             anim.SetTrigger("Move");
+
+            //사운드
+            audio.clip = FindSoundClip("Move");
+            if (!audio.isPlaying)
+                audio.Play();
+
             transform.position += targetEnemy.parent.forward * 0.6f * Time.deltaTime;
             return;
         }
@@ -112,6 +118,12 @@ public class LancerFSM : ArmyFSM
         if (Vector3.Distance(targetEnemy.position, transform.position) < 0.3f)
         {
             anim.SetTrigger("Move");
+
+            //사운드
+            audio.clip = FindSoundClip("Move");
+            if (!audio.isPlaying)
+                audio.Play();
+
             transform.position += transform.forward * -0.1f * Time.deltaTime;
             return;
         }
@@ -128,6 +140,12 @@ public class LancerFSM : ArmyFSM
                 Vector3.Distance(targetEnemy.position, transform.position) >= 0.3f)
             {
                 anim.SetTrigger("Attack");
+
+                //사운드
+                audio.clip = FindSoundClip("Attack");
+                if (!audio.isPlaying)
+                    audio.Play();
+
                 targetEnemy.GetComponent<EnemyHPManager>().HP -= 5;
                 targetEnemy.GetComponent<EnemyHPManager>().StartPushed(transform);
                 curTime = 0.0f;

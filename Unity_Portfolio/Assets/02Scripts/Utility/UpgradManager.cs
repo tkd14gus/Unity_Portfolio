@@ -8,6 +8,8 @@ using UnityEngine.EventSystems;
 
 public class UpgradManager : MonoBehaviour
 {
+    private AudioSource audio;
+    private AudioSource subAu;
     //현재 지휘관이 몇인지.
     private int commanderNum;
     private GameObject ca;
@@ -17,6 +19,8 @@ public class UpgradManager : MonoBehaviour
 
     void Start()
     {
+        subAu = gameObject.AddComponent<AudioSource>();
+
         commanderNum = PlayerInfoManager.instance.GetacfCount();
 
         ca = GameObject.Find("Canvas");
@@ -81,12 +85,17 @@ public class UpgradManager : MonoBehaviour
     //돌아가기 버튼을 눌렀을 때
     public void OnClickBack()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
         //나간다.
         SceneManager.LoadScene("WaitingScene");
     }
 
     public void OnClickCommander()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
         for (int i = 0; i < commanderNum; i++)
         {
             //뭘 눌렀는지 확인
@@ -112,8 +121,14 @@ public class UpgradManager : MonoBehaviour
     {
         //돈이 없으면 업그레이드를 못한다.
         if (PlayerInfoManager.instance.Coin < 5)
+        {
+            subAu.clip = (AudioClip)Resources.Load("Sound/UpgradeError");
+            subAu.Play();
             return;
+        }
 
+        subAu.clip = (AudioClip)Resources.Load("Sound/UpgradeSound");
+        subAu.Play();
         for (int i = 0; i < 3; i++)
         {
             //뭘 눌렀는지 확인

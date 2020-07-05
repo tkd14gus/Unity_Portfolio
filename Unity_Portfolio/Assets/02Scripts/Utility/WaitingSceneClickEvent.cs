@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class WaitingSceneClickEvent : MonoBehaviour
 {
-
+    private AudioSource audio;
     private int stage;
     private Text coin;
 
@@ -22,10 +22,15 @@ public class WaitingSceneClickEvent : MonoBehaviour
         }
 
         ChangeCoin();
+
+        BGMMgr.Instance.PlayBGM("WaitBGM");
     }
 
     public void OnClickLevel02()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
         if (PlayerInfoManager.instance.Stage == 1)
         {
             //첫번째 맵을 올려준다.
@@ -42,6 +47,9 @@ public class WaitingSceneClickEvent : MonoBehaviour
 
     public void OnClickLevel03()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
         if (PlayerInfoManager.instance.Stage == 2)
         {
             //첫번째 맵을 올려준다.
@@ -57,7 +65,10 @@ public class WaitingSceneClickEvent : MonoBehaviour
 
     public void OnClickLevel04()
     {
-        if (PlayerInfoManager.instance.Stage == 2)
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
+        if (PlayerInfoManager.instance.Stage == 3)
         {
             //첫번째 맵을 올려준다.
             SceneManager.LoadScene("Level04");
@@ -72,6 +83,9 @@ public class WaitingSceneClickEvent : MonoBehaviour
 
     public void OnClicUpgrad()
     {
+        audio = GetComponent<AudioSource>();
+        audio.PlayOneShot(audio.clip);
+
         SceneManager.LoadScene("UpgradScene");
     }
 
