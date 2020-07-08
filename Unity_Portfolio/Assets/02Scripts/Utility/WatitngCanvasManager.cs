@@ -305,7 +305,7 @@ public class WatitngCanvasManager : MonoBehaviour
                 break;
             }
         }
-        Debug.Log("i : " + i + " " + "clickNum : " + clickNum);
+
         //어떤 번트을 눌렀는지 확인 후
         //일단 텍스트 받아온다.
         string tempCalss = tempBtn.transform.GetChild(0).GetComponent<Text>().text;

@@ -20,8 +20,8 @@ public class LancerFSM : ArmyFSM
     // Update is called once per frame
     protected override void Update()
     {
-        base.Update();
         StartCoroutine(ChangeAttack());
+        base.Update();
     }
 
     //이동중일 땐 공격이 안되므로 여기서 따로 확인해준다.
@@ -34,7 +34,7 @@ public class LancerFSM : ArmyFSM
             //근데 자식 클래스에선 enum문을 가져올 수 없다.
             //부모 클래스에서 확인해주자.
             if (!CheckIdle())
-                StopCoroutine(ChangeAttack());
+                yield return null;
             
             //주변에 가장 가까운 Enemy찾기
             //주변에 Enemy가 있는지를 확인할 때 사용하는 변수

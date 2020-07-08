@@ -35,9 +35,9 @@ public class CamMove : MonoBehaviour
         gameObject.GetComponent<Camera>().fieldOfView += -wheel * zoomSpeed * Time.deltaTime;
 
         //최소 최대 제한
-        if (gameObject.GetComponent<Camera>().fieldOfView < 15.0f)
-            gameObject.GetComponent<Camera>().fieldOfView = 15.0f;
-        if(gameObject.GetComponent<Camera>().fieldOfView > 45.0f)
+        if (gameObject.GetComponent<Camera>().fieldOfView < 0.0f/*15.0f*/)
+            gameObject.GetComponent<Camera>().fieldOfView = 0.0f/*15.0f*/;
+        if (gameObject.GetComponent<Camera>().fieldOfView > 45.0f)
             gameObject.GetComponent<Camera>().fieldOfView = 45.0f;
     }
 

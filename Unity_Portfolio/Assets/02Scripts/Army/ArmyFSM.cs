@@ -24,7 +24,8 @@ public class ArmyFSM : MonoBehaviour
         {
             mPoint = value;
             ArSt = ArmyState.Move;
-            //StopAllCoroutines();
+            StopAllCoroutines();
+            StartCoroutine(ChangeAttack());
             //agent.isStopped = false;
             print("All -> 무브");
         }
@@ -228,6 +229,7 @@ public class ArmyFSM : MonoBehaviour
 
     private void Move()
     {
+        agent.isStopped = false;
         //애니메이션
         anim.SetTrigger("Move");
 

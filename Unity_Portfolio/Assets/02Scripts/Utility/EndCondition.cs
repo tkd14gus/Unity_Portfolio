@@ -121,6 +121,7 @@ public class EndCondition : MonoBehaviour
             //일시정지 시켜준다.
             Time.timeScale = 0;
             StopAllCoroutines();
+            BGMMgr.Instance.PlayBGM("OpenBGM");
             Debug.Log("승리");
             GameObject.Find("EndUI").GetComponent<EndUIEvent>().GameClearImage();
             GameObject.Find("SoundManager").GetComponent<BattleSound>().MainPlay("ClearSound");
